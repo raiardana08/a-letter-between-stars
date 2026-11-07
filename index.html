@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#292631">
+  <title>A Letter Between the Stars</title>
+  <meta name="description" content="Someone left a little letter for you.">
+  <meta property="og:title" content="A Letter Between the Stars">
+  <meta property="og:description" content="Someone left a little letter for you.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23292631'/%3E%3Cpath d='M32 10L38 26L54 32L38 38L32 54L26 38L10 32L26 26Z' fill='%23E9CBC3'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="is-loading" data-theme="dusk">
+
+  <!-- Ikon & ornamen (SVG sprite) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-sprig" viewBox="0 0 64 64">
+      <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M32 60C31 44 33 28 32 8"/>
+        <path d="M32 46c-9 1-15-4-17-12 9-1 16 3 17 12z"/>
+        <path d="M32 36c9 1 15-4 17-12-9-1-16 3-17 12z"/>
+        <path d="M32 26c-7 0-12-4-13-10 7 0 12 3 13 10z"/>
+        <circle cx="32" cy="6" r="2.4"/>
+      </g>
+    </symbol>
+    <symbol id="i-back" viewBox="0 0 24 24">
+      <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24">
+      <path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </svg>
+
+  <!-- Lapisan latar (crossfade antar tema) -->
+  <div class="bg bg-dusk" aria-hidden="true"></div>
+  <div class="bg bg-paper" aria-hidden="true"></div>
+  <div class="bg bg-night" aria-hidden="true"></div>
+  <div class="bg bg-final" aria-hidden="true"></div>
+
+  <!-- Canvas bintang + partikel (satu canvas untuk seluruh situs) -->
+  <canvas id="sky" aria-hidden="true"></canvas>
+
+  <!-- Loading -->
+  <div id="loader" class="loader" role="status" aria-live="polite">
+    <div class="loader__star" aria-hidden="true"></div>
+    <p class="loader__text">preparing a letter…</p>
+  </div>
+
+  <noscript>
+    <p style="position:fixed;inset:0;display:grid;place-items:center;padding:2rem;text-align:center;color:#F8F0EB;background:#292631;z-index:99;font-family:Georgia,serif">
+      This little letter needs JavaScript to be opened.
+    </p>
+  </noscript>
+
+  <!-- Bilah atas: kembali · navigasi chapter · musik -->
+  <header class="topbar" id="topbar">
+    <button class="iconbtn" id="btnBack" type="button" aria-label="Previous chapter" disabled>
+      <svg class="ico"><use href="#i-back"/></svg>
+    </button>
+
+    <button class="navbtn" id="btnMenu" type="button" aria-expanded="false" aria-controls="menu" aria-label="Chapters">
+      <span class="navbtn__label"><span id="navNum">01</span><span class="navbtn__sep">·</span><span id="navTitle">The Beginning</span></span>
+      <span class="dots" id="dots" aria-hidden="true"></span>
+    </button>
+
+    <button class="iconbtn" id="btnMusic" type="button" aria-pressed="false" aria-label="Play music">
+      <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+    </button>
+  </header>
+
+  <nav class="menu" id="menu" aria-label="Chapters">
+    <ol class="menu__list" id="menuList"></ol>
+  </nav>
+
+  <main id="stage">
+
+    <!-- ============ CHAPTER 01 — THE BEGINNING ============ -->
+    <section class="chapter" id="ch1" data-index="0" tabindex="-1" aria-label="Chapter 1">
+      <div class="wrap wrap--center">
+        <div class="moon rise" style="--d:0" aria-hidden="true"></div>
+        <p class="eyebrow rise" style="--d:250" id="siteName" data-t="siteTitle"></p>
+        <h1 class="headline" id="headline" data-t="chapter1.headline"></h1>
+        <p class="subhead rise" style="--d:2000" data-t="chapter1.subheadline"></p>
+        <div class="actions rise" style="--d:2900">
+          <button class="btn btn--primary" id="btnBegin" type="button">
+            <span data-t="chapter1.button"></span>
+            <svg class="ico ico--sm"><use href="#i-arrow"/></svg>
+          </button>
+        </div>
+        <p class="forline rise" style="--d:3500" id="forLine" data-t="chapter1.forLine"></p>
+      </div>
+    </section>
+
+    <!-- ============ CHAPTER 02 — LITTLE THINGS ============ -->
+    <section class="chapter" id="ch2" data-index="1" tabindex="-1" aria-label="Chapter 2">
+      <div class="wrap">
+        <header class="ch-head">
+          <p class="eyebrow rise" style="--d:0" data-t="chapter2.label"></p>
+          <h2 class="ch-title rise" style="--d:120" data-t="chapter2.title"></h2>
+          <div class="orn rise" style="--d:240" aria-hidden="true"><span></span><svg class="ico"><use href="#i-sprig"/></svg><span></span></div>
+          <p class="ch-intro rise" style="--d:360" data-t="chapter2.intro"></p>
+        </header>
+        <div class="cards rise" style="--d:500" id="cards"></div>
+        <p class="caption rise" style="--d:600" id="cardsCaption" aria-live="polite"></p>
+        <div class="actions rise" style="--d:700">
+          <button class="btn btn--primary js-next" id="next2" type="button">
+            <span data-t="chapter2.next"></span>
+            <svg class="ico ico--sm"><use href="#i-arrow"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHAPTER 03 — UNSPOKEN WORDS ============ -->
+    <section class="chapter" id="ch3" data-index="2" tabindex="-1" aria-label="Chapter 3">
+      <div class="wrap">
+        <header class="ch-head">
+          <p class="eyebrow rise" style="--d:0" data-t="chapter3.label"></p>
+          <h2 class="ch-title rise" style="--d:120" data-t="chapter3.title"></h2>
+        </header>
+        <article class="letter rise" style="--d:300" id="letter">
+          <p class="letter__date" id="letterDate"></p>
+          <p class="letter__greet" id="letterGreet"></p>
+          <div class="letter__body" id="letterBody"></div>
+          <p class="letter__closing" id="letterClosing"></p>
+          <p class="letter__sign" id="letterSign"></p>
+          <svg class="ico letter__sprig" aria-hidden="true"><use href="#i-sprig"/></svg>
+        </article>
+        <p class="letter__note" id="letterNote"></p>
+        <div class="actions">
+          <button class="btn btn--primary js-next" id="next3" type="button">
+            <span data-t="chapter3.next"></span>
+            <svg class="ico ico--sm"><use href="#i-arrow"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHAPTER 04 — A UNIVERSE FOR YOU ============ -->
+    <section class="chapter chapter--sky" id="ch4" data-index="3" tabindex="-1" aria-label="Chapter 4">
+      <div class="sky-top">
+        <p class="eyebrow rise" style="--d:0" data-t="chapter4.label"></p>
+        <h2 class="ch-title rise" style="--d:120" data-t="chapter4.title"></h2>
+        <p class="ch-intro rise" style="--d:260" data-t="chapter4.intro"></p>
+        <p class="counter rise" style="--d:400" id="starCounter"><span id="starCount">0</span> / <span id="starTotal">0</span> <span data-t="chapter4.foundLabel"></span></p>
+      </div>
+      <div class="sky-bottom">
+        <div class="wish rise" style="--d:600" id="wishPanel" role="status" aria-live="polite">
+          <p class="wish__text" id="wishText"></p>
+        </div>
+        <button class="btn btn--primary js-next rise" style="--d:800" id="next4" type="button">
+          <span data-t="chapter4.next"></span>
+          <svg class="ico ico--sm"><use href="#i-arrow"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ CHAPTER 05 — THE FINAL REVEAL ============ -->
+    <section class="chapter" id="ch5" data-index="4" tabindex="-1" aria-label="Chapter 5">
+      <div class="wrap wrap--center">
+        <p class="eyebrow rise" style="--d:0" data-t="chapter5.label"></p>
+        <h2 class="final__prompt rise" style="--d:150" data-t="chapter5.prompt"></h2>
+
+        <div class="env-stage rise" style="--d:600">
+          <div class="env-glow" aria-hidden="true"></div>
+          <button class="envelope" id="envelope" type="button" aria-label="Open the envelope">
+            <span class="env-back"></span>
+            <span class="env-letter" aria-hidden="true">
+              <span class="env-to" id="envTo"></span>
+              <i></i><i></i><i class="short"></i>
+            </span>
+            <span class="env-front"></span>
+            <span class="env-flap"></span>
+            <span class="env-seal" aria-hidden="true"><span class="seal-moon"></span></span>
+          </button>
+        </div>
+
+        <p class="env-hint rise" style="--d:1000" id="envHint" data-t="chapter5.hint"></p>
+      </div>
+    </section>
+
+    <!-- Pengungkapan akhir (di atas chapter 5) -->
+    <div class="reveal" id="reveal" aria-hidden="true">
+      <div class="reveal__dust" id="revealDust" aria-hidden="true"></div>
+      <div class="reveal__inner">
+        <div class="moon moon--dark r r0" aria-hidden="true"></div>
+        <p class="r r1" id="rvLine" data-t="chapter5.revealLine"></p>
+        <p class="r r2" id="senderName"></p>
+        <div class="r r3 reveal__closing" id="rvClosing"></div>
+        <p class="r r3 reveal__date" id="rvDate"></p>
+        <div class="r r4 actions actions--row">
+          <button class="btn btn--primary" id="btnReplay" type="button"><span data-t="chapter5.replayButton"></span></button>
+          <button class="btn btn--ghost" id="btnStars" type="button"><span data-t="chapter5.backButton"></span></button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Urutan penting: config dulu -->
+  <script src="config.js"></script>
+  <script src="js/music.js"></script>
+  <script src="js/sky.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
