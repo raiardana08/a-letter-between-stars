@@ -38,7 +38,7 @@ window.LETTER_CONFIG = {
   music: {
     // Kosongkan untuk memakai musik ambient bawaan (dibuat langsung oleh browser,
     // tanpa file). Atau isi dengan file Anda, mis. "assets/music.mp3".
-    src: "",
+    src: "assets/music.mp3",
     volume: 0.5,                  // 0 - 1
     autoStartOnFirstJourney: true // musik mulai saat tombol "Take a Little Journey" disentuh
   },
