@@ -13,8 +13,30 @@
     return;
   }
 
-  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var THEMES = ['dusk', 'paper', 'paper', 'night', 'final'];
+  var rmq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var reduceMotion = !!(rmq && rmq.matches);
+  if (rmq) {
+    var onRm = function (e) { reduceMotion = e.matches; };
+    if (rmq.addEventListener) rmq.addEventListener('change', onRm); else if (rmq.addListener) rmq.addListener(onRm);
+  }
+
+  // Tiap chapter punya data-key di index.html. Tema dan blok config dicari lewat key,
+  // jadi menyisipkan bagian baru tidak menggeser apa pun.
+  var THEMES = { begin: 'dusk', things: 'paper', words: 'paper', sky: 'night', wish: 'wish', reveal: 'final' };
+  var CFG_KEYS = { begin: 'chapter1', things: 'chapter2', words: 'chapter3', sky: 'chapter4', wish: 'chapterWish', reveal: 'chapter5' };
+
+  // Nilai bawaan untuk bagian opsional, supaya config.js lama tetap berjalan
+  var WISH_DEFAULTS = {
+    label: 'A quiet moment', title: 'Make a Wish',
+    prompt: 'If you could wish for one thing tonight, what would it be?',
+    placeholder: 'Write your wish here...', button: 'Send to the Stars',
+    emptyError: 'Write a few words first. Even a small wish counts.',
+    confirmation: 'Perhaps the universe has heard you.',
+    localNote: "Your wish is kept on this device only. It isn't sent or synced anywhere.",
+    noStorageNote: "This browser couldn't save your wish, so it will only last until you close this page.",
+    another: 'Make another wish', next: 'Continue', skip: 'Not tonight', maxLength: 240
+  };
+  CFG.chapterWish = Object.assign({}, WISH_DEFAULTS, CFG.chapterWish || {});
 
   /* ---------- util ---------- */
   function $(s, r) { return (r || document).querySelector(s); }
@@ -37,7 +59,26 @@
       return map[k] != null ? map[k] : m;
     });
   }
-  function chap(i) { return CFG['chapter' + (i + 1)] || {}; }
+  function keyOf(i) { return chapters[i] ? chapters[i].getAttribute('data-key') : ''; }
+  function idxOf(key) {
+    for (var i = 0; i < chapters.length; i++) if (keyOf(i) === key) return i;
+    return -1;
+  }
+  function cfgOf(key) { return CFG[CFG_KEYS[key]] || {}; }
+  function chap(i) { return cfgOf(keyOf(i)); }
+  // Nomor tampilan: chapter asli 01-05, bagian sisipan memakai ✦
+  function displayNum(i) {
+    if (chapters[i] && chapters[i].hasAttribute('data-interlude')) return '\u2726';
+    var n = 0;
+    for (var k = 0; k <= i; k++) if (!chapters[k].hasAttribute('data-interlude')) n++;
+    return pad2(n);
+  }
+  function announce(msg) {
+    var a = $('#announcer');
+    if (!a) return;
+    a.textContent = '';
+    setTimeout(function () { a.textContent = msg; }, 60);
+  }
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
 
   /* ---------- elemen ---------- */
@@ -56,6 +97,11 @@
       var v = get(CFG, n.getAttribute('data-t'));
       if (v == null) { console.warn('[Letter] Config tidak ditemukan:', n.getAttribute('data-t')); return; }
       n.textContent = tpl(v);
+    });
+    $$('[data-t-attr]').forEach(function (n) {
+      var parts = n.getAttribute('data-t-attr').split(':');
+      var v = get(CFG, parts[1]);
+      if (v != null) n.setAttribute(parts[0], tpl(v));
     });
     document.title = tpl(CFG.siteTitle || document.title);
   }
@@ -107,20 +153,27 @@
       setTimeout(function () { prev.classList.remove('is-leaving'); }, 950);
       setInert(prev, true);
     }
-    if (prevIndex === 4) resetFinal();
+    if (prevIndex >= 0 && keyOf(prevIndex) === 'reveal') resetFinal();
 
     nextEl.style.scrollBehavior = 'auto';
     nextEl.scrollTop = 0;
     nextEl.style.scrollBehavior = '';
     setInert(nextEl, false);
-    setTheme(THEMES[i]);
+    setTheme(THEMES[keyOf(i)] || 'dusk');
     nextEl.classList.add('is-active');
     updateNav();
+    announce(chapterLabel(i));
+    if (keyOf(i) === 'sky') setTimeout(updateBand, reduceMotion ? 120 : 2000);
 
     setTimeout(function () {
       busy = false;
       try { nextEl.focus({ preventScroll: true }); } catch (e) { /* abaikan */ }
     }, reduceMotion ? 60 : 1000);
+  }
+
+  function chapterLabel(i) {
+    var num = chapters[i].hasAttribute('data-interlude') ? '' : 'Chapter ' + displayNum(i) + ': ';
+    return num + tpl(chap(i).title || '');
   }
 
   function next() {
@@ -137,7 +190,7 @@
       var b = el('button', 'menu__item');
       b.type = 'button';
       b.setAttribute('data-i', i);
-      b.appendChild(el('span', 'menu__num', pad2(i + 1)));
+      b.appendChild(el('span', 'menu__num', displayNum(i)));
       b.appendChild(el('span', 'menu__name', ''));
       b.addEventListener('click', function () { goTo(i); });
       li.appendChild(b);
@@ -146,7 +199,7 @@
   }
 
   function updateNav() {
-    navNum.textContent = pad2(current + 1);
+    navNum.textContent = displayNum(current);
     navTitle.textContent = tpl(chap(current).title || '');
     $$('i', dotsEl).forEach(function (d, i) {
       d.className = i < current ? 'is-done' : (i === current ? 'is-current' : '');
@@ -164,11 +217,23 @@
   function openMenu() {
     menu.classList.add('is-open');
     btnMenu.setAttribute('aria-expanded', 'true');
+    setTimeout(function () {
+      var b = $('.menu__item.is-current', menuList) || $('.menu__item:not(:disabled)', menuList);
+      if (b && menu.classList.contains('is-open')) b.focus();
+    }, 60);
   }
-  function closeMenu() {
+  function closeMenu(returnFocus) {
+    var wasOpen = menu.classList.contains('is-open');
     menu.classList.remove('is-open');
     btnMenu.setAttribute('aria-expanded', 'false');
+    if (wasOpen && returnFocus === true) btnMenu.focus();
   }
+  function isTyping(t) {
+    if (!t || !t.tagName) return false;
+    var tag = t.tagName;
+    return tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT' || t.isContentEditable === true;
+  }
+  function menuItems() { return $$('.menu__item:not(:disabled)', menuList); }
 
   /* ---------- musik ---------- */
   function setupMusic() {
@@ -177,7 +242,6 @@
     window.Music.onstate = function (on) {
       btnMusic.classList.toggle('is-playing', on);
       btnMusic.setAttribute('aria-pressed', on ? 'true' : 'false');
-      btnMusic.setAttribute('aria-label', on ? 'Pause music' : 'Play music');
     };
     btnMusic.addEventListener('click', function () { window.Music.toggle(); });
   }
@@ -201,7 +265,9 @@
     list.forEach(function (c, i) {
       var card = el('button', 'card');
       card.type = 'button';
-      card.setAttribute('aria-pressed', 'false');
+      var label0 = tpl(c.title), label1 = label0 + '. ' + tpl(c.message);
+      card.setAttribute('aria-label', label0);
+      card.setAttribute('aria-expanded', 'false');
 
       var inner = el('span', 'card__inner');
       var front = el('span', 'card__face card__front');
@@ -216,7 +282,8 @@
       var counted = false;
       card.addEventListener('click', function () {
         var on = card.classList.toggle('is-flipped');
-        card.setAttribute('aria-pressed', on ? 'true' : 'false');
+        card.setAttribute('aria-expanded', on ? 'true' : 'false');
+        card.setAttribute('aria-label', on ? label1 : label0);
         if (on && !counted) { counted = true; opened++; updateCaption(); }
       });
       wrap.appendChild(card);
@@ -259,9 +326,11 @@
 
   /* ---------- chapter 04: bintang ---------- */
   function setupStars() {
-    var c = chap(3), wishes = c.wishes || [];
+    var c = cfgOf('sky'), wishes = c.wishes || [];
     var found = {}, count = 0;
     var text = $('#wishText'), countEl = $('#starCount'), totalEl = $('#starTotal'), counter = $('#starCounter');
+    var starBtn = $('#starNext');
+    if (starBtn) starBtn.textContent = tpl(c.revealNext || 'Reveal the next star');
     totalEl.textContent = wishes.length;
     text.textContent = tpl(c.idle || '');
     text.classList.add('is-idle');
@@ -281,16 +350,24 @@
         if (count >= wishes.length) {
           counter.textContent = tpl(c.complete || '');
           $('#next4').classList.add('is-ready');
+          if (starBtn) {                                   // semua bintang ditemukan: tombol keyboard tidak diperlukan lagi
+            var had = document.activeElement === starBtn;
+            starBtn.hidden = true;
+            if (had) $('#next4').focus();
+          }
         }
       }
     };
+    if (starBtn) starBtn.addEventListener('click', function () {
+      for (var i = 0; i < wishes.length; i++) if (!found[i]) { window.Sky.pick(i); break; }
+    });
   }
 
   /* ---------- chapter 05: amplop & pengungkapan ---------- */
   function later(ms, fn) { finalTimers.push(setTimeout(fn, ms)); }
 
   function setupFinal() {
-    var c = chap(4);
+    var c = cfgOf('reveal');
     var env = $('#envelope'), hint = $('#envHint'), reveal = $('#reveal');
 
     $('#envTo').textContent = tpl(c.envelopeFor || '');
@@ -323,13 +400,16 @@
     });
 
     $('#btnReplay').addEventListener('click', function () { goTo(0); });
-    $('#btnStars').addEventListener('click', function () { goTo(3); });
+    $('#btnStars').addEventListener('click', function () { goTo(idxOf('sky')); });
 
     function showReveal() {
       finalState = 'revealed';
       reveal.classList.add('show');
       reveal.setAttribute('aria-hidden', 'false');
       setTheme('reveal');
+      var c5 = chapters[idxOf('reveal')];
+      if (c5) setInert(c5, true);                    // amplop di belakang overlay tidak boleh bisa difokus
+      setTimeout(function () { try { reveal.focus({ preventScroll: true }); } catch (e) { /* abaikan */ } }, 80);
     }
   }
 
@@ -341,11 +421,103 @@
     reveal.setAttribute('aria-hidden', 'true');
     // kembalikan amplop setelah layar pengungkapan memudar
     setTimeout(function () {
-      if (current === 4) return;
+      if (keyOf(current) === 'reveal') return;
       $('#envelope').classList.remove('is-open', 'is-out');
       $('#envHint').classList.remove('is-hidden');
       finalState = 'idle';
     }, 900);
+  }
+
+  /* ---------- sisipan: Make a Wish ---------- */
+  function setupWish() {
+    var c = cfgOf('wish');
+    var form = $('#wishForm'), input = $('#wishInput'), count = $('#wishCount'), err = $('#wishError');
+    var btn = $('#btnSendWish'), done = $('#wishDone'), confirm = $('#wishConfirm'), note = $('#wishNote');
+    var more = $('#btnWishMore'), skip = $('#btnWishSkip'), stage = $('.wish-stage');
+    var max = Number(c.maxLength) > 0 ? Number(c.maxLength) : 240;
+    var sending = false, finished = false, fallback = 0;
+    input.maxLength = max;
+
+    function updateCount() {
+      count.textContent = input.value.length + ' / ' + max;
+      count.classList.toggle('is-near', input.value.length >= max * 0.9);
+    }
+    function showError(msg) {
+      err.textContent = msg;
+      input.setAttribute('aria-invalid', 'true');
+      stage.classList.remove('is-shake'); void stage.offsetWidth; stage.classList.add('is-shake');
+    }
+    function clearError() { err.textContent = ''; input.removeAttribute('aria-invalid'); }
+
+    input.addEventListener('input', function () { updateCount(); if (err.textContent) clearError(); });
+    input.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); submit(); }
+    });
+    form.addEventListener('submit', function (e) { e.preventDefault(); submit(); });
+
+    function submit() {
+      if (sending) return;                                   // cegah kirim ganda
+      var text = input.value.trim();
+      if (!text) { showError(c.emptyError); input.focus(); return; }
+      if (!window.Wishes) { showError('Something went wrong. Please refresh and try again.'); return; }
+
+      sending = true; finished = false;
+      btn.disabled = true; btn.setAttribute('aria-busy', 'true');
+      input.readOnly = true;
+      clearError();
+
+      var res = window.Wishes.add(text);
+      if (!res.ok) {
+        sending = false; btn.disabled = false; btn.removeAttribute('aria-busy'); input.readOnly = false;
+        showError(c.emptyError); input.focus();
+        return;
+      }
+
+      stage.classList.add('is-sending');
+      var finish = function () {
+        if (finished) return;
+        finished = true; clearTimeout(fallback);
+        showDone(res.persistent);
+      };
+      var r = btn.getBoundingClientRect();
+      fallback = setTimeout(finish, 6000);                   // jaring pengaman bila animasi tertahan
+      if (window.Sky && typeof window.Sky.launchWish === 'function' && window.Sky.launchWish({ x: r.left + r.width / 2, y: r.top + r.height / 2 }, finish)) {
+        /* animasi berjalan; finish dipanggil saat bintang tiba */
+      } else {
+        finish();
+      }
+    }
+
+    function showDone(persistent) {
+      form.hidden = true; skip.hidden = true;
+      confirm.textContent = c.confirmation;
+      note.textContent = persistent ? c.localNote : c.noStorageNote;
+      done.hidden = false;
+      stage.classList.remove('is-sending');
+      stage.classList.add('is-done');
+      try { confirm.focus({ preventScroll: true }); } catch (e) { /* abaikan */ }
+    }
+
+    more.addEventListener('click', function () {
+      input.value = ''; updateCount(); clearError();
+      form.hidden = false; skip.hidden = false; done.hidden = true;
+      stage.classList.remove('is-done');
+      sending = false; btn.disabled = false; btn.removeAttribute('aria-busy'); input.readOnly = false;
+      input.focus();
+    });
+
+    updateCount();
+  }
+
+  /* Batas area bintang harapan (Chapter 4): di antara teks atas dan panel bawah */
+  function updateBand() {
+    if (!window.Sky || !window.Sky.setBand) return;
+    var top = $('#ch4 .sky-top'), bottom = $('#ch4 .sky-bottom');
+    if (!top || !bottom) return;
+    var a = top.getBoundingClientRect(), b = bottom.getBoundingClientRect();
+    var t = a.bottom + 22, btm = b.top - 22;
+    if (btm - t < 80) { var mid = (t + btm) / 2; t = mid - 40; btm = mid + 40; }
+    window.Sky.setBand(t, btm);
   }
 
   /* ---------- tombol & keyboard ---------- */
@@ -359,9 +531,27 @@
       if (menu.classList.contains('is-open') && !menu.contains(e.target) && !btnMenu.contains(e.target)) closeMenu();
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeMenu();
-      else if (e.key === 'ArrowLeft') goTo(current - 1);
+      var open = menu.classList.contains('is-open');
+      if (e.key === 'Escape') { if (open) { e.preventDefault(); closeMenu(true); } return; }
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+
+      // Di dalam menu: panah atas/bawah memilih chapter
+      if (open && menu.contains(document.activeElement)) {
+        var items = menuItems(), at = items.indexOf(document.activeElement);
+        if (e.key === 'ArrowDown') { e.preventDefault(); items[(at + 1) % items.length].focus(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); items[(at - 1 + items.length) % items.length].focus(); }
+        else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+        else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+        return;
+      }
+
+      // Panah kiri/kanan berpindah chapter, kecuali saat mengetik (mis. kolom wish)
+      if (isTyping(e.target)) return;
+      if (e.key === 'ArrowLeft') goTo(current - 1);
       else if (e.key === 'ArrowRight' && current + 1 <= maxReached) goTo(current + 1);
+    });
+    menu.addEventListener('focusout', function (e) {
+      if (menu.classList.contains('is-open') && e.relatedTarget && !menu.contains(e.relatedTarget) && e.relatedTarget !== btnMenu) closeMenu();
     });
 
     $$('.js-next').forEach(function (b) { b.addEventListener('click', next); });
@@ -387,8 +577,13 @@
       buildCards();
       buildLetter();
       setupStars();
+      setupWish();
       setupFinal();
       checkConfig();
+      var bandTimer = 0;
+      var refreshBand = function () { clearTimeout(bandTimer); bandTimer = setTimeout(updateBand, 200); };
+      window.addEventListener('resize', refreshBand);
+      window.addEventListener('orientationchange', refreshBand);
       chapters.forEach(function (c) { setInert(c, true); });
     } catch (err) {
       console.error('[Letter] Gagal menyiapkan halaman:', err);

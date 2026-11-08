@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="theme-color" content="#292631">
   <title>A Letter Between the Stars</title>
   <meta name="description" content="Someone left a little letter for you.">
@@ -30,6 +30,9 @@
         <circle cx="32" cy="6" r="2.4"/>
       </g>
     </symbol>
+    <symbol id="i-star" viewBox="0 0 24 24">
+      <path d="M12 2l2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z" fill="currentColor"/>
+    </symbol>
     <symbol id="i-back" viewBox="0 0 24 24">
       <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
@@ -53,6 +56,9 @@
     <p class="loader__text">preparing a letter…</p>
   </div>
 
+  <!-- Pengumuman perpindahan chapter untuk pembaca layar -->
+  <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
   <noscript>
     <p style="position:fixed;inset:0;display:grid;place-items:center;padding:2rem;text-align:center;color:#F8F0EB;background:#292631;z-index:99;font-family:Georgia,serif">
       This little letter needs JavaScript to be opened.
@@ -61,6 +67,7 @@
 
   <!-- Bilah atas: kembali · navigasi chapter · musik -->
   <header class="topbar" id="topbar">
+    <h1 class="sr-only" id="siteH1">A Letter Between the Stars</h1>
     <button class="iconbtn" id="btnBack" type="button" aria-label="Previous chapter" disabled>
       <svg class="ico"><use href="#i-back"/></svg>
     </button>
@@ -70,7 +77,7 @@
       <span class="dots" id="dots" aria-hidden="true"></span>
     </button>
 
-    <button class="iconbtn" id="btnMusic" type="button" aria-pressed="false" aria-label="Play music">
+    <button class="iconbtn" id="btnMusic" type="button" aria-pressed="false" aria-label="Background music">
       <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
     </button>
   </header>
@@ -82,11 +89,11 @@
   <main id="stage">
 
     <!-- ============ CHAPTER 01 — THE BEGINNING ============ -->
-    <section class="chapter" id="ch1" data-index="0" tabindex="-1" aria-label="Chapter 1">
+    <section class="chapter" id="ch1" data-key="begin" tabindex="-1" aria-labelledby="headline">
       <div class="wrap wrap--center">
         <div class="moon rise" style="--d:0" aria-hidden="true"></div>
         <p class="eyebrow rise" style="--d:250" id="siteName" data-t="siteTitle"></p>
-        <h1 class="headline" id="headline" data-t="chapter1.headline"></h1>
+        <h2 class="headline" id="headline" data-t="chapter1.headline"></h2>
         <p class="subhead rise" style="--d:2000" data-t="chapter1.subheadline"></p>
         <div class="actions rise" style="--d:2900">
           <button class="btn btn--primary" id="btnBegin" type="button">
@@ -99,11 +106,11 @@
     </section>
 
     <!-- ============ CHAPTER 02 — LITTLE THINGS ============ -->
-    <section class="chapter" id="ch2" data-index="1" tabindex="-1" aria-label="Chapter 2">
+    <section class="chapter" id="ch2" data-key="things" tabindex="-1" aria-labelledby="t2">
       <div class="wrap">
         <header class="ch-head">
           <p class="eyebrow rise" style="--d:0" data-t="chapter2.label"></p>
-          <h2 class="ch-title rise" style="--d:120" data-t="chapter2.title"></h2>
+          <h2 class="ch-title rise" style="--d:120" id="t2" data-t="chapter2.title"></h2>
           <div class="orn rise" style="--d:240" aria-hidden="true"><span></span><svg class="ico"><use href="#i-sprig"/></svg><span></span></div>
           <p class="ch-intro rise" style="--d:360" data-t="chapter2.intro"></p>
         </header>
@@ -119,11 +126,11 @@
     </section>
 
     <!-- ============ CHAPTER 03 — UNSPOKEN WORDS ============ -->
-    <section class="chapter" id="ch3" data-index="2" tabindex="-1" aria-label="Chapter 3">
+    <section class="chapter" id="ch3" data-key="words" tabindex="-1" aria-labelledby="t3">
       <div class="wrap">
         <header class="ch-head">
           <p class="eyebrow rise" style="--d:0" data-t="chapter3.label"></p>
-          <h2 class="ch-title rise" style="--d:120" data-t="chapter3.title"></h2>
+          <h2 class="ch-title rise" style="--d:120" id="t3" data-t="chapter3.title"></h2>
         </header>
         <article class="letter rise" style="--d:300" id="letter">
           <p class="letter__date" id="letterDate"></p>
@@ -144,14 +151,15 @@
     </section>
 
     <!-- ============ CHAPTER 04 — A UNIVERSE FOR YOU ============ -->
-    <section class="chapter chapter--sky" id="ch4" data-index="3" tabindex="-1" aria-label="Chapter 4">
+    <section class="chapter chapter--sky" id="ch4" data-key="sky" tabindex="-1" aria-labelledby="t4">
       <div class="sky-top">
         <p class="eyebrow rise" style="--d:0" data-t="chapter4.label"></p>
-        <h2 class="ch-title rise" style="--d:120" data-t="chapter4.title"></h2>
+        <h2 class="ch-title rise" style="--d:120" id="t4" data-t="chapter4.title"></h2>
         <p class="ch-intro rise" style="--d:260" data-t="chapter4.intro"></p>
         <p class="counter rise" style="--d:400" id="starCounter"><span id="starCount">0</span> / <span id="starTotal">0</span> <span data-t="chapter4.foundLabel"></span></p>
       </div>
       <div class="sky-bottom">
+        <button class="btn btn--ghost sr-focus" id="starNext" type="button"></button>
         <div class="wish rise" style="--d:600" id="wishPanel" role="status" aria-live="polite">
           <p class="wish__text" id="wishText"></p>
         </div>
@@ -162,11 +170,55 @@
       </div>
     </section>
 
+    <!-- ============ SISIPAN — MAKE A WISH ============ -->
+    <section class="chapter chapter--wish" id="chWish" data-key="wish" data-interlude tabindex="-1" aria-labelledby="tWish">
+      <div class="wrap wrap--center">
+        <header class="ch-head">
+          <p class="eyebrow rise" style="--d:0" data-t="chapterWish.label"></p>
+          <h2 class="ch-title rise" style="--d:120" id="tWish" data-t="chapterWish.title"></h2>
+          <div class="orn rise" style="--d:240" aria-hidden="true"><span></span><svg class="ico"><use href="#i-star"/></svg><span></span></div>
+        </header>
+
+        <div class="wish-stage rise" style="--d:400">
+          <form class="wishcard" id="wishForm" novalidate autocomplete="off">
+            <label class="wishcard__prompt" for="wishInput" data-t="chapterWish.prompt"></label>
+            <textarea class="wishcard__input" id="wishInput" name="wish" rows="4" maxlength="240"
+                      data-t-attr="placeholder:chapterWish.placeholder" aria-describedby="wishCount wishError"
+                      enterkeyhint="done" spellcheck="true"></textarea>
+            <div class="wishcard__meta">
+              <p class="wishcard__error" id="wishError" role="alert"></p>
+              <p class="wishcard__count" id="wishCount">0 / 240</p>
+            </div>
+            <div class="actions">
+              <button class="btn btn--primary" id="btnSendWish" type="submit">
+                <span data-t="chapterWish.button"></span>
+                <svg class="ico ico--sm"><use href="#i-star"/></svg>
+              </button>
+            </div>
+          </form>
+
+          <div class="wishdone" id="wishDone" hidden>
+            <p class="wishdone__text" id="wishConfirm" tabindex="-1" role="status"></p>
+            <p class="wishdone__note" id="wishNote"></p>
+            <div class="actions actions--row">
+              <button class="btn btn--ghost" id="btnWishMore" type="button"><span data-t="chapterWish.another"></span></button>
+              <button class="btn btn--primary js-next" id="nextWish" type="button">
+                <span data-t="chapterWish.next"></span>
+                <svg class="ico ico--sm"><use href="#i-arrow"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="textbtn js-next rise" style="--d:700" id="btnWishSkip" type="button" data-t="chapterWish.skip"></button>
+      </div>
+    </section>
+
     <!-- ============ CHAPTER 05 — THE FINAL REVEAL ============ -->
-    <section class="chapter" id="ch5" data-index="4" tabindex="-1" aria-label="Chapter 5">
+    <section class="chapter" id="ch5" data-key="reveal" tabindex="-1" aria-labelledby="t5">
       <div class="wrap wrap--center">
         <p class="eyebrow rise" style="--d:0" data-t="chapter5.label"></p>
-        <h2 class="final__prompt rise" style="--d:150" data-t="chapter5.prompt"></h2>
+        <h2 class="final__prompt rise" style="--d:150" id="t5" data-t="chapter5.prompt"></h2>
 
         <div class="env-stage rise" style="--d:600">
           <div class="env-glow" aria-hidden="true"></div>
@@ -187,11 +239,11 @@
     </section>
 
     <!-- Pengungkapan akhir (di atas chapter 5) -->
-    <div class="reveal" id="reveal" aria-hidden="true">
+    <div class="reveal" id="reveal" aria-hidden="true" role="region" aria-labelledby="rvLine" tabindex="-1">
       <div class="reveal__dust" id="revealDust" aria-hidden="true"></div>
       <div class="reveal__inner">
         <div class="moon moon--dark r r0" aria-hidden="true"></div>
-        <p class="r r1" id="rvLine" data-t="chapter5.revealLine"></p>
+        <h2 class="r r1" id="rvLine" data-t="chapter5.revealLine"></h2>
         <p class="r r2" id="senderName"></p>
         <div class="r r3 reveal__closing" id="rvClosing"></div>
         <p class="r r3 reveal__date" id="rvDate"></p>
@@ -208,6 +260,7 @@
   <script src="config.js"></script>
   <script src="js/music.js"></script>
   <script src="js/sky.js"></script>
+  <script src="js/wishes.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

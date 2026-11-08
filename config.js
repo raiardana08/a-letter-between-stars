@@ -106,6 +106,7 @@ window.LETTER_CONFIG = {
     intro: "Touch the stars. Each one holds a small wish.",
     idle: "Touch a star to see what it holds.",
     foundLabel: "stars found",
+    revealNext: "Reveal the next star",   // tombol untuk pengguna keyboard / pembaca layar
     complete: "You found every star.",
     wishes: [
       "I hope your days feel gentle.",
@@ -118,6 +119,25 @@ window.LETTER_CONFIG = {
       "Whatever comes, I hope you keep becoming you."
     ],
     next: "Continue"
+  },
+
+  /* ===================== SISIPAN — MAKE A WISH ========================= */
+  /* Bagian opsional di antara Chapter 04 dan 05. Wish disimpan di browser
+     pengunjung saja (localStorage), tidak dikirim atau disinkronkan online. */
+  chapterWish: {
+    label: "A quiet moment",
+    title: "Make a Wish",
+    prompt: "If you could wish for one thing tonight, what would it be?",
+    placeholder: "Write your wish here...",
+    button: "Send to the Stars",
+    emptyError: "Write a few words first. Even a small wish counts.",
+    confirmation: "Perhaps the universe has heard you.",
+    localNote: "Your wish is kept on this device only. It isn't sent or synced anywhere.",
+    noStorageNote: "This browser couldn't save your wish, so it will only last until you close this page.",
+    another: "Make another wish",
+    next: "Continue",
+    skip: "Not tonight",
+    maxLength: 240
   },
 
   /* ============================ CHAPTER 05 ============================== */

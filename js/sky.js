@@ -13,7 +13,12 @@
   var ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var rmq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var reduce = !!(rmq && rmq.matches);
+  if (rmq) {
+    var onRm = function (e) { reduce = e.matches; };
+    if (rmq.addEventListener) rmq.addEventListener('change', onRm); else if (rmq.addListener) rmq.addListener(onRm);
+  }
   var lowEnd = (navigator.deviceMemory && navigator.deviceMemory <= 4) ||
                (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
   var TAU = Math.PI * 2;
@@ -23,6 +28,7 @@
     dusk:   { stars: 0.9,  dust: 0.55, tone: 0, interactive: false, shoot: true  },
     paper:  { stars: 0,    dust: 1,    tone: 1, interactive: false, shoot: false },
     night:  { stars: 1,    dust: 0.35, tone: 0, interactive: true,  shoot: true  },
+    wish:   { stars: 1,    dust: 0.4,  tone: 0, interactive: false, shoot: false },
     final:  { stars: 0.65, dust: 0.7,  tone: 0, interactive: false, shoot: false },
     reveal: { stars: 0,    dust: 0,    tone: 1, interactive: false, shoot: false }
   };
@@ -39,7 +45,10 @@
     init: init,
     setMode: setMode,
     setWishes: setWishes,
-    markFound: markFound
+    markFound: markFound,
+    pick: pick,
+    setBand: setBand,
+    launchWish: launchWish
   };
   window.Sky = api;
 
@@ -80,8 +89,16 @@
   }
 
   /* ---------- bintang harapan (chapter 04) ---------- */
-  function bandTop() { return Math.max(150, H * 0.22); }
-  function bandBottom() { return H - Math.max(210, H * 0.3); }
+  // Batas area bintang harapan. main.js mengukurnya dari teks di atas dan panel di bawah,
+  // agar bintang tidak menimpa teks di layar kecil maupun landscape. Nilai awal = perkiraan.
+  var band = null;
+  function bandTop() { return band ? band.top : Math.max(150, H * 0.22); }
+  function bandBottom() { return band ? band.bottom : H - Math.max(210, H * 0.3); }
+  function setBand(top, bottom) {
+    if (!isFinite(top) || !isFinite(bottom)) return;
+    band = { top: top, bottom: Math.max(top + 40, bottom) };
+    clampWishes();
+  }
 
   function setWishes(count) {
     wishes = [];
@@ -147,6 +164,21 @@
     }
   }
 
+  // Memilih bintang tanpa sentuhan (untuk keyboard / pembaca layar): efek dan callback sama dengan onPointer.
+  function pick(i) {
+    for (var k = 0; k < wishes.length; k++) {
+      if (wishes[k].i === i) {
+        var b = wishes[k];
+        b.flash = 1;
+        burst(b.x, b.y, 14);
+        rings.push({ x: b.x, y: b.y, r: 6, life: 0, max: 1.1, big: true });
+        if (typeof api.onPick === 'function') api.onPick(b.i);
+        return true;
+      }
+    }
+    return false;
+  }
+
   function burst(x, y, n) {
     for (var i = 0; i < n && sparks.length < 70; i++) {
       var a = rand(0, TAU), s = rand(30, 110);
@@ -198,6 +230,8 @@
       rg.life += dt;
       if (rg.life >= rg.max) { rings.splice(i, 1); }
     }
+
+    updateWishStar(dt);
 
     // bintang jatuh
     if (m.shoot && !reduce) {
@@ -298,6 +332,8 @@
       ctx.beginPath(); ctx.arc(sp.x, sp.y, sp.r * (0.6 + f), 0, TAU); ctx.fill();
     }
 
+    drawWishStar();
+
     // bintang jatuh
     if (shoot) {
       var f2 = 1 - shoot.life / shoot.max, len = 0.11;
@@ -315,6 +351,91 @@
       hg.addColorStop(1, 'rgba(233,203,195,0)');
       ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(shoot.x, shoot.y, 9, 0, TAU); ctx.fill();
     }
+  }
+
+  /* ---------- bintang permohonan (Make a Wish) ----------
+     Melesat dari tombol kirim, melengkung ke langit atas, lalu mekar.
+     Memakai canvas, partikel, dan cincin yang sama dengan bagian lain.
+     Dengan reduced-motion: tanpa perjalanan, hanya mekar cahaya lembut. */
+  var wishStar = null;
+
+  function launchWish(from, onArrive) {
+    if (wishStar) return false;
+    var fx = from && isFinite(from.x) ? from.x : W / 2;
+    var fy = from && isFinite(from.y) ? from.y : H * 0.7;
+    var tx = rand(W * 0.58, W * 0.88), ty = rand(H * 0.1, H * 0.22);
+    canvas.classList.add('is-front');
+    wishStar = {
+      fx: fx, fy: fy, tx: tx, ty: ty,
+      cx: fx + (tx - fx) * 0.18, cy: fy - (fy - ty) * 0.9,
+      x: reduce ? tx : fx, y: reduce ? ty : fy,
+      t: 0, dur: 2.3, phase: reduce ? 'bloom' : 'fly', bloom: 0, bloomDur: reduce ? 1.4 : 1.2,
+      trail: [], arrived: false, onArrive: onArrive
+    };
+    if (reduce) arriveWish();
+    return true;
+  }
+
+  function arriveWish() {
+    var w = wishStar;
+    if (!w || w.arrived) return;
+    w.arrived = true;
+    if (!reduce) burst(w.tx, w.ty, 14);
+    rings.push({ x: w.tx, y: w.ty, r: 6, life: 0, max: 1.3, big: true });
+    if (typeof w.onArrive === 'function') { try { w.onArrive(); } catch (e) { console.error(e); } }
+  }
+
+  function updateWishStar(dt) {
+    var w = wishStar;
+    if (!w) return;
+    w.t += dt;
+    if (w.phase === 'fly') {
+      var u = Math.min(w.t / w.dur, 1);
+      var e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      var a = 1 - e;
+      w.x = a * a * w.fx + 2 * a * e * w.cx + e * e * w.tx;
+      w.y = a * a * w.fy + 2 * a * e * w.cy + e * e * w.ty;
+      w.trail.push({ x: w.x, y: w.y, t: w.t });
+      if (sparks.length < 60 && Math.random() < 0.6) {
+        sparks.push({ x: w.x + rand(-3, 3), y: w.y + rand(-3, 3), vx: rand(-14, 14), vy: rand(6, 26), life: 0, max: rand(0.5, 1), r: rand(0.6, 1.5) });
+      }
+      if (u >= 1) { w.phase = 'bloom'; arriveWish(); }
+    } else {
+      w.bloom += dt;
+    }
+    while (w.trail.length && w.t - w.trail[0].t > 0.65) w.trail.shift();
+    if (w.phase === 'bloom' && w.bloom >= w.bloomDur) {
+      canvas.classList.remove('is-front');
+      wishStar = null;
+    }
+  }
+
+  function drawWishStar() {
+    var w = wishStar;
+    if (!w) return;
+    var n = w.trail.length, i;
+    ctx.lineCap = 'round';
+    for (i = 1; i < n; i++) {
+      var k = i / n, age = Math.max(0, 1 - (w.t - w.trail[i].t) / 0.65), al = k * 0.85 * age;
+      var p0 = w.trail[i - 1], p1 = w.trail[i];
+      ctx.strokeStyle = 'rgba(233,203,195,' + (al * 0.28).toFixed(3) + ')';
+      ctx.lineWidth = 2 + k * 7;
+      ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,240,232,' + al.toFixed(3) + ')';
+      ctx.lineWidth = 0.8 + k * 2.2;
+      ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+    }
+    var head = w.phase === 'fly' ? 1 : Math.max(0, 1 - w.bloom / w.bloomDur);
+    var grow = w.phase === 'bloom' ? Math.min(1, w.bloom / 0.35) : 0;
+    var r = 12 + grow * 28;
+    var g = ctx.createRadialGradient(w.x, w.y, 0, w.x, w.y, r);
+    g.addColorStop(0, 'rgba(255,246,240,' + (0.95 * head).toFixed(3) + ')');
+    g.addColorStop(0.35, 'rgba(233,203,195,' + (0.35 * head).toFixed(3) + ')');
+    g.addColorStop(1, 'rgba(201,143,145,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(w.x, w.y, r, 0, TAU); ctx.fill();
+    ctx.fillStyle = 'rgba(255,250,246,' + head.toFixed(3) + ')';
+    sparkle(w.x, w.y, 5 + grow * 4, 0);
   }
 
   /* ---------- loop ---------- */
