@@ -305,8 +305,15 @@
       var lg = ctx.createLinearGradient(tx, ty, shoot.x, shoot.y);
       lg.addColorStop(0, 'rgba(248,240,235,0)');
       lg.addColorStop(1, 'rgba(248,240,235,' + (0.85 * f2).toFixed(3) + ')');
-      ctx.strokeStyle = lg; ctx.lineWidth = 1.4; ctx.lineCap = 'round';
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = lg; ctx.lineWidth = 4; ctx.globalAlpha = 0.22;          // lapisan kilau lembut
       ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(shoot.x, shoot.y); ctx.stroke();
+      ctx.globalAlpha = 1; ctx.lineWidth = 1.4;                                  // garis inti
+      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(shoot.x, shoot.y); ctx.stroke();
+      var hg = ctx.createRadialGradient(shoot.x, shoot.y, 0, shoot.x, shoot.y, 9);
+      hg.addColorStop(0, 'rgba(255,244,236,' + (0.9 * f2).toFixed(3) + ')');
+      hg.addColorStop(1, 'rgba(233,203,195,0)');
+      ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(shoot.x, shoot.y, 9, 0, TAU); ctx.fill();
     }
   }
 
