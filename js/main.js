@@ -22,8 +22,8 @@
 
   // Tiap chapter punya data-key di index.html. Tema dan blok config dicari lewat key,
   // jadi menyisipkan bagian baru tidak menggeser apa pun.
-  var THEMES = { begin: 'dusk', things: 'paper', words: 'paper', sky: 'night', wish: 'wish', reveal: 'final' };
-  var CFG_KEYS = { begin: 'chapter1', things: 'chapter2', words: 'chapter3', sky: 'chapter4', wish: 'chapterWish', reveal: 'chapter5' };
+  var THEMES = { begin: 'dusk', things: 'paper', words: 'paper', sky: 'night', wish: 'wish', constellation: 'wish', bottle: 'wish', reveal: 'final' };
+  var CFG_KEYS = { begin: 'chapter1', things: 'chapter2', words: 'chapter3', sky: 'chapter4', wish: 'chapterWish', constellation: 'chapterConst', bottle: 'chapterBottle', reveal: 'chapter5' };
 
   // Nilai bawaan untuk bagian opsional, supaya config.js lama tetap berjalan
   var WISH_DEFAULTS = {
@@ -154,12 +154,16 @@
       setInert(prev, true);
     }
     if (prevIndex >= 0 && keyOf(prevIndex) === 'reveal') resetFinal();
+    if (prevIndex >= 0 && keyOf(prevIndex) === 'constellation' && window.Constellation) window.Constellation.leave();
+    if (prevIndex >= 0 && keyOf(prevIndex) === 'bottle' && window.Bottle) window.Bottle.leave();
 
     nextEl.style.scrollBehavior = 'auto';
     nextEl.scrollTop = 0;
     nextEl.style.scrollBehavior = '';
     setInert(nextEl, false);
     setTheme(THEMES[keyOf(i)] || 'dusk');
+    if (keyOf(i) === 'constellation' && window.Constellation) window.Constellation.enter();
+    if (keyOf(i) === 'bottle' && window.Bottle) window.Bottle.enter();
     nextEl.classList.add('is-active');
     updateNav();
     announce(chapterLabel(i));
@@ -532,7 +536,12 @@
     });
     document.addEventListener('keydown', function (e) {
       var open = menu.classList.contains('is-open');
-      if (e.key === 'Escape') { if (open) { e.preventDefault(); closeMenu(true); } return; }
+      if (e.key === 'Escape') {
+        if (open) { e.preventDefault(); closeMenu(true); }
+        else if (window.Constellation && window.Constellation.isOpen()) { e.preventDefault(); window.Constellation.close(); }
+        else if (window.Bottle && window.Bottle.isOpen()) { e.preventDefault(); window.Bottle.close(); }
+        return;
+      }
       if (e.altKey || e.ctrlKey || e.metaKey) return;
 
       // Di dalam menu: panah atas/bawah memilih chapter
@@ -545,8 +554,10 @@
         return;
       }
 
-      // Panah kiri/kanan berpindah chapter, kecuali saat mengetik (mis. kolom wish)
+      // Panah kiri/kanan berpindah chapter, kecuali saat mengetik (mis. kolom wish) atau panel wish terbuka
       if (isTyping(e.target)) return;
+      if (window.Constellation && window.Constellation.isOpen()) return;
+      if (window.Bottle && window.Bottle.isOpen()) return;
       if (e.key === 'ArrowLeft') goTo(current - 1);
       else if (e.key === 'ArrowRight' && current + 1 <= maxReached) goTo(current + 1);
     });
@@ -555,6 +566,9 @@
     });
 
     $$('.js-next').forEach(function (b) { b.addEventListener('click', next); });
+    $$('[data-goto]').forEach(function (b) {
+      b.addEventListener('click', function () { var i = idxOf(b.getAttribute('data-goto')); if (i >= 0) goTo(i); });
+    });
 
     $('#btnBegin').addEventListener('click', function () {
       var m = CFG.music || {};
@@ -578,6 +592,8 @@
       buildLetter();
       setupStars();
       setupWish();
+      if (window.Constellation) window.Constellation.init();
+      if (window.Bottle) window.Bottle.init();
       setupFinal();
       checkConfig();
       var bandTimer = 0;

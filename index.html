@@ -33,6 +33,9 @@
     <symbol id="i-star" viewBox="0 0 24 24">
       <path d="M12 2l2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z" fill="currentColor"/>
     </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
     <symbol id="i-back" viewBox="0 0 24 24">
       <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
@@ -214,6 +217,108 @@
       </div>
     </section>
 
+    <!-- ============ SISIPAN — CONSTELLATION OF WISHES ============ -->
+    <section class="chapter chapter--const" id="chConst" data-key="constellation" data-interlude tabindex="-1" aria-labelledby="tConst">
+      <div class="const-wrap" id="constMain">
+        <div class="sky-top">
+          <p class="eyebrow rise" style="--d:0" data-t="chapterConst.label"></p>
+          <h2 class="ch-title rise" style="--d:120" id="tConst" data-t="chapterConst.title"></h2>
+          <p class="ch-intro rise" style="--d:260" data-t="chapterConst.intro"></p>
+          <p class="counter rise" style="--d:400" id="constCount" aria-live="polite" hidden></p>
+        </div>
+
+        <div class="const-stage rise" style="--d:500" id="constStage" role="group" data-t-attr="aria-label:chapterConst.groupLabel">
+          <svg class="const-lines" id="constLines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"></svg>
+          <div class="const-stars" id="constStars"></div>
+          <div class="const-empty" id="constEmpty" hidden>
+            <svg class="ico const-empty__star" aria-hidden="true"><use href="#i-star"/></svg>
+            <p class="const-empty__text" data-t="chapterConst.emptyText"></p>
+            <button class="btn btn--primary" id="btnConstFirst" type="button" data-goto="wish">
+              <span data-t="chapterConst.emptyButton"></span>
+              <svg class="ico ico--sm"><use href="#i-star"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="const-bottom">
+          <button class="btn btn--primary js-next rise" style="--d:700" id="nextConst" type="button">
+            <span data-t="chapterConst.next"></span>
+            <svg class="ico ico--sm"><use href="#i-arrow"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SISIPAN — WISH IN A BOTTLE ============ -->
+    <section class="chapter chapter--bottle" id="chBottle" data-key="bottle" data-interlude tabindex="-1" aria-labelledby="tBottle">
+      <div class="bottle-wrap" id="bottleMain">
+        <div class="sky-top">
+          <p class="eyebrow rise" style="--d:0" data-t="chapterBottle.label"></p>
+          <h2 class="ch-title rise" style="--d:120" id="tBottle" data-t="chapterBottle.title"></h2>
+          <p class="ch-intro rise" style="--d:260" data-t="chapterBottle.intro"></p>
+          <p class="counter rise" style="--d:400" id="bottleCount" aria-live="polite" hidden></p>
+        </div>
+
+        <div class="bottle-stage rise" style="--d:500" id="bottleStage">
+          <div class="bottle-sea" aria-hidden="true"></div>
+          <button class="bottle" id="bottleBtn" type="button" data-t-attr="aria-label:chapterBottle.bottleLabel">
+            <span class="bottle__float">
+              <svg class="bottle__svg" viewBox="0 0 200 320" aria-hidden="true" focusable="false">
+                <defs>
+                  <clipPath id="bClip"><path id="bShape" d="M86 38h28v44c0 14 6 22 22 36 16 14 24 30 24 52v96c0 22-14 34-34 34H74c-20 0-34-12-34-34v-96c0-22 8-38 24-52 16-14 22-22 22-36z"/></clipPath>
+                  <radialGradient id="bGlow" cx="50%" cy="62%" r="55%">
+                    <stop offset="0" stop-color="#FFE9D6" stop-opacity=".95"/>
+                    <stop offset=".45" stop-color="#E9CBC3" stop-opacity=".38"/>
+                    <stop offset="1" stop-color="#C98F91" stop-opacity="0"/>
+                  </radialGradient>
+                  <linearGradient id="bGlass" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#F8F0EB" stop-opacity=".22"/>
+                    <stop offset=".5" stop-color="#E9CBC3" stop-opacity=".07"/>
+                    <stop offset="1" stop-color="#F8F0EB" stop-opacity=".16"/>
+                  </linearGradient>
+                </defs>
+                <g clip-path="url(#bClip)">
+                  <rect x="30" y="30" width="140" height="280" fill="url(#bGlass)"/>
+                  <ellipse class="b-glow" cx="100" cy="212" rx="62" ry="78" fill="url(#bGlow)"/>
+                  <g class="b-scroll">
+                    <rect x="80" y="160" width="40" height="84" rx="9" fill="#F8F0EB"/>
+                    <rect x="80" y="160" width="40" height="84" rx="9" fill="none" stroke="#C98F91" stroke-opacity=".5"/>
+                    <path d="M88 176h24M88 188h24M88 200h16" stroke="#987D78" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+                    <rect x="78" y="212" width="44" height="7" rx="3" fill="#C98F91"/>
+                  </g>
+                  <path d="M52 176v82" stroke="#fff" stroke-opacity=".38" stroke-width="5" stroke-linecap="round" fill="none"/>
+                  <path d="M52 276q2 8 10 12" stroke="#fff" stroke-opacity=".22" stroke-width="4" stroke-linecap="round" fill="none"/>
+                </g>
+                <path d="M92 52v30" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <path d="M86 38h28v44c0 14 6 22 22 36 16 14 24 30 24 52v96c0 22-14 34-34 34H74c-20 0-34-12-34-34v-96c0-22 8-38 24-52 16-14 22-22 22-36z" fill="none" stroke="#E9CBC3" stroke-opacity=".6" stroke-width="2.2" stroke-linejoin="round"/>
+                <g class="b-cork">
+                  <rect x="82" y="16" width="36" height="28" rx="6" fill="#987D78"/>
+                  <path d="M88 24h24M88 32h24" stroke="#604A49" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
+                </g>
+              </svg>
+              <span class="bottle__dust" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            </span>
+          </button>
+
+          <div class="bottle-empty" id="bottleEmpty" hidden>
+            <p class="bottle-empty__text" data-t="chapterBottle.emptyText"></p>
+            <button class="btn btn--primary" id="btnBottleWrite" type="button" data-goto="wish">
+              <span data-t="chapterBottle.emptyButton"></span>
+              <svg class="ico ico--sm"><use href="#i-star"/></svg>
+            </button>
+          </div>
+        </div>
+        <p class="bottle-hint rise" style="--d:650" id="bottleHint" data-t="chapterBottle.hint"></p>
+
+        <div class="const-bottom">
+          <button class="btn btn--primary js-next rise" style="--d:800" id="nextBottle" type="button">
+            <span data-t="chapterBottle.next"></span>
+            <svg class="ico ico--sm"><use href="#i-arrow"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ CHAPTER 05 — THE FINAL REVEAL ============ -->
     <section class="chapter" id="ch5" data-key="reveal" tabindex="-1" aria-labelledby="t5">
       <div class="wrap wrap--center">
@@ -238,6 +343,38 @@
       </div>
     </section>
 
+    <!-- Panel detail wish (Constellation of Wishes) -->
+    <div class="cpanel-wrap" id="cPanelWrap" aria-hidden="true" inert>
+      <div class="cpanel" id="cPanel" role="dialog" aria-modal="true" aria-labelledby="cpTitle" aria-describedby="cpText" tabindex="-1">
+        <button class="iconbtn cpanel__close" id="cpClose" type="button" data-t-attr="aria-label:chapterConst.closeLabel">
+          <svg class="ico"><use href="#i-close"/></svg>
+        </button>
+        <svg class="ico cpanel__star" aria-hidden="true"><use href="#i-star"/></svg>
+        <h2 class="cpanel__title" id="cpTitle" data-t="chapterConst.panelTitle"></h2>
+        <p class="cpanel__text" id="cpText"></p>
+        <p class="cpanel__date" id="cpDate"></p>
+      </div>
+    </div>
+
+    <!-- Panel surat (Wish in a Bottle) -->
+    <div class="bpanel-wrap" id="bPanelWrap" aria-hidden="true" inert>
+      <div class="bpanel" id="bPanel" role="dialog" aria-modal="true" aria-labelledby="bpTitle" aria-describedby="bpText" tabindex="-1">
+        <button class="iconbtn bpanel__close" id="bpClose" type="button" data-t-attr="aria-label:chapterBottle.closeLabel">
+          <svg class="ico"><use href="#i-close"/></svg>
+        </button>
+        <p class="bpanel__eyebrow" id="bpTitle" data-t="chapterBottle.panelTitle"></p>
+        <div class="bpanel__body" id="bpBody">
+          <p class="bpanel__text" id="bpText"></p>
+          <p class="bpanel__date" id="bpDate"></p>
+        </div>
+        <div class="bpanel__nav" id="bpNav">
+          <button class="iconbtn bpanel__step" id="bpPrev" type="button" data-t-attr="aria-label:chapterBottle.prevLabel"><svg class="ico"><use href="#i-back"/></svg></button>
+          <span class="bpanel__pos" id="bpPos" aria-live="polite"></span>
+          <button class="iconbtn bpanel__step" id="bpNext" type="button" data-t-attr="aria-label:chapterBottle.nextLabel"><svg class="ico bpanel__fwd"><use href="#i-back"/></svg></button>
+        </div>
+      </div>
+    </div>
+
     <!-- Pengungkapan akhir (di atas chapter 5) -->
     <div class="reveal" id="reveal" aria-hidden="true" role="region" aria-labelledby="rvLine" tabindex="-1">
       <div class="reveal__dust" id="revealDust" aria-hidden="true"></div>
@@ -261,6 +398,8 @@
   <script src="js/music.js"></script>
   <script src="js/sky.js"></script>
   <script src="js/wishes.js"></script>
+  <script src="js/constellation.js"></script>
+  <script src="js/bottle.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

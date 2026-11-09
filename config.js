@@ -140,7 +140,50 @@ window.LETTER_CONFIG = {
     maxLength: 240
   },
 
+  /* ==================== SISIPAN — WISH IN A BOTTLE ====================== */
+  /* Botol kaca berisi wish dari "Make a Wish" (data yang sama dengan Constellation). Blok ini opsional. */
+  chapterBottle: {
+    label: "Kept for later",
+    title: "Wish in a Bottle",
+    intro: "Some wishes deserve to be kept, even when the night is over.",
+    hint: "Touch the bottle to open it",
+    bottleLabel: "Open the bottle and read a wish",
+    countOne: "1 wish inside",
+    countMany: "{n} wishes inside",
+    panelTitle: "A wish from the bottle",
+    dateLabel: "Made on {when}",
+    position: "{n} of {total}",
+    prevLabel: "Previous wish",
+    nextLabel: "Next wish",
+    closeLabel: "Close",
+    emptyText: "Some wishes are still waiting to be written.",
+    emptyButton: "Write a Wish",
+    next: "Continue"
+  },
+
   /* ============================ CHAPTER 05 ============================== */
+  /* ================= SISIPAN — CONSTELLATION OF WISHES ================== */
+  /* Setiap wish dari "Make a Wish" tampil sebagai satu bintang. Seluruh blok ini opsional:
+     jika dihapus, nilai bawaan yang sama dipakai. Token: {n} jumlah, {total} total, {when} tanggal. */
+  chapterConst: {
+    label: "Your night sky",
+    title: "Constellation of Wishes",
+    intro: "Every wish becomes a star. Touch one to read it.",
+    groupLabel: "Your wishes, as stars",
+    countOne: "1 wish among the stars",
+    countMany: "{n} wishes among the stars",
+    overflow: "showing the latest {n}",
+    emptyText: "Your constellation is waiting for its first star.",
+    emptyButton: "Make Your First Wish",
+    panelTitle: "Somewhere in this universe, this wish exists.",
+    dateLabel: "Made on {when}",
+    closeLabel: "Close",
+    starLabel: "Wish {n} of {total}, made on {when}",
+    starLabelNoDate: "Wish {n} of {total}",
+    next: "Continue",
+    maxStars: 200            // jumlah bintang maksimum yang digambar (yang terbaru); sisanya tetap tersimpan
+  },
+
   chapter5: {
     label: "Chapter 05",
     title: "The Final Reveal",

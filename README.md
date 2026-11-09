@@ -11,6 +11,8 @@ js/main.js        alur chapter, navigasi, kartu, surat, bintang, Make a Wish, am
 js/sky.js         canvas bintang, partikel, bintang jatuh, bintang permohonan
 js/music.js       musik latar (satu pemutar)
 js/wishes.js      penyimpanan wish (localStorage), satu-satunya tempat wish dibaca/ditulis
+js/constellation.js  Constellation of Wishes: membaca Wishes.all() dan menggambar satu bintang per wish
+js/bottle.js      Wish in a Bottle: botol kaca (SVG) yang membuka satu wish dari Wishes.all()
 assets/music.mp3  musik Anda
 .nojekyll         agar GitHub Pages menyajikan file apa adanya
 ```
@@ -40,3 +42,23 @@ Alamat bisa membocorkan identitas pengirim: hindari nama asli di username atau n
 - Data rusak disalin dulu ke `letter.wishes.v1.corrupt` sebelum koleksi dimulai ulang.
 - Jika penyimpanan diblokir (mis. mode privat), wish hanya bertahan selama halaman terbuka dan pengunjung diberi tahu.
 - Menghapus semua wish (untuk menguji): di console browser, `localStorage.removeItem('letter.wishes.v1')`.
+
+## Constellation of Wishes
+- Chapter interlude setelah Make a Wish (nav menampilkan ✦). Satu wish = satu bintang; ketuk bintang untuk membaca wish dan tanggalnya di panel kaca.
+- **Tidak ada penyimpanan baru.** Fitur ini hanya memanggil `Wishes.all()` dan mendengarkan event `wishes:changed`, sehingga selalu sama dengan data `letter.wishes.v1`.
+- **Posisi stabil tanpa disimpan**: dihitung dari ID wish (hash -> generator acak berbenih), diurutkan menurut waktu dibuat. Wish baru ditambahkan di akhir, jadi bintang lama tidak pernah bergeser; refresh menghasilkan posisi yang sama.
+- Posisi berupa persentase area langit, jadi tata letak relatif sama di semua ukuran layar.
+- Maksimal `chapterConst.maxStars` bintang (default 200, tertinggi 400) digambar, yang terbaru; sisanya tetap tersimpan.
+- Tanpa wish: tampil "Your constellation is waiting for its first star." dengan tombol menuju form Make a Wish yang sudah ada.
+- Teks di `config.js` pada blok `chapterConst` (opsional; bila dihapus, bawaan dipakai).
+- Tata letak di-cache: hanya wish baru yang dihitung; selama urutan wish lama sama, hasilnya dipakai ulang (hasil identik dengan perhitungan penuh).
+- Saat panel terbuka, area konstelasi, bar atas (kembali/menu/musik) dan menu chapter dibuat `inert`; panel berada di atas semuanya (z-index 40).
+
+## Wish in a Bottle
+- Chapter interlude setelah Constellation (urutan: Make a Wish -> Constellation -> Wish in a Bottle -> Final Reveal).
+- Botol digambar dengan SVG + CSS (tanpa gambar). Ketuk botol: gabus terangkat, gulungan naik, lalu panel surat terbuka berisi satu wish dan tanggalnya.
+- Jika wish lebih dari satu: tombol sebelumnya/berikutnya atau panah kiri/kanan. Pembukaan botol berikutnya selalu memilih wish yang berbeda dari yang terakhir dibaca. Hanya satu wish tampil sekali waktu.
+- **Tidak ada penyimpanan baru**: hanya memanggil `Wishes.all()` dan mendengarkan `wishes:changed`, sama seperti Constellation. Wish tidak disalin atau dihapus.
+- Tanpa wish: "Some wishes are still waiting to be written." dengan tombol "Write a Wish" menuju form Make a Wish yang sudah ada.
+- Teks di `config.js` pada blok `chapterBottle` (opsional; bila dihapus, bawaan dipakai).
+- Saat panel terbuka, latar, bar atas dan menu menjadi `inert`; Escape menutup dan fokus kembali ke botol.
