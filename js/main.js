@@ -22,8 +22,8 @@
 
   // Tiap chapter punya data-key di index.html. Tema dan blok config dicari lewat key,
   // jadi menyisipkan bagian baru tidak menggeser apa pun.
-  var THEMES = { begin: 'dusk', things: 'paper', words: 'paper', sky: 'night', wish: 'wish', constellation: 'wish', bottle: 'wish', reveal: 'final' };
-  var CFG_KEYS = { begin: 'chapter1', things: 'chapter2', words: 'chapter3', sky: 'chapter4', wish: 'chapterWish', constellation: 'chapterConst', bottle: 'chapterBottle', reveal: 'chapter5' };
+  var THEMES = { begin: 'dusk', things: 'paper', words: 'paper', sky: 'night', wish: 'wish', constellation: 'wish', bottle: 'wish', moon: 'wish', reveal: 'final', leave: 'wish' };
+  var CFG_KEYS = { begin: 'chapter1', things: 'chapter2', words: 'chapter3', sky: 'chapter4', wish: 'chapterWish', constellation: 'chapterConst', bottle: 'chapterBottle', moon: 'chapterMoon', reveal: 'chapter5', leave: 'chapterLeave' };
 
   // Nilai bawaan untuk bagian opsional, supaya config.js lama tetap berjalan
   var WISH_DEFAULTS = {
@@ -90,6 +90,7 @@
 
   var current = -1, maxReached = 0, busy = false;
   var finalTimers = [], finalState = 'idle';
+  var resetters = [];            // fungsi pengembali keadaan tiap chapter, dipakai oleh "Experience It Again"
 
   /* ---------- teks dari config ---------- */
   function bindText() {
@@ -156,6 +157,7 @@
     if (prevIndex >= 0 && keyOf(prevIndex) === 'reveal') resetFinal();
     if (prevIndex >= 0 && keyOf(prevIndex) === 'constellation' && window.Constellation) window.Constellation.leave();
     if (prevIndex >= 0 && keyOf(prevIndex) === 'bottle' && window.Bottle) window.Bottle.leave();
+    if (prevIndex >= 0 && keyOf(prevIndex) === 'moon' && window.Moon) window.Moon.leave();
 
     nextEl.style.scrollBehavior = 'auto';
     nextEl.scrollTop = 0;
@@ -164,6 +166,7 @@
     setTheme(THEMES[keyOf(i)] || 'dusk');
     if (keyOf(i) === 'constellation' && window.Constellation) window.Constellation.enter();
     if (keyOf(i) === 'bottle' && window.Bottle) window.Bottle.enter();
+    if (keyOf(i) === 'moon' && window.Moon) window.Moon.enter();
     nextEl.classList.add('is-active');
     updateNav();
     announce(chapterLabel(i));
@@ -205,6 +208,8 @@
   function updateNav() {
     navNum.textContent = displayNum(current);
     navTitle.textContent = tpl(chap(current).title || '');
+    var navLabel = navTitle.parentNode;                      // umpan balik halus saat chapter berganti
+    if (navLabel && navLabel.classList) { navLabel.classList.remove('is-swap'); void navLabel.offsetWidth; navLabel.classList.add('is-swap'); }
     $$('i', dotsEl).forEach(function (d, i) {
       d.className = i < current ? 'is-done' : (i === current ? 'is-current' : '');
     });
@@ -284,6 +289,10 @@
       card.appendChild(inner);
 
       var counted = false;
+      resetters.push(function () {
+        counted = false; card.classList.remove('is-flipped');
+        card.setAttribute('aria-expanded', 'false'); card.setAttribute('aria-label', label0);
+      });
       card.addEventListener('click', function () {
         var on = card.classList.toggle('is-flipped');
         card.setAttribute('aria-expanded', on ? 'true' : 'false');
@@ -292,6 +301,7 @@
       });
       wrap.appendChild(card);
     });
+    resetters.push(function () { opened = 0; updateCaption(); $('#next2').classList.remove('is-ready'); });
     updateCaption();
   }
 
@@ -326,6 +336,9 @@
     } else {
       lines.forEach(function (n) { n.classList.add('seen'); });
     }
+    resetters.push(function () {
+      lines.forEach(function (n) { n.classList.remove('seen'); if (io) io.observe(n); else n.classList.add('seen'); });
+    });
   }
 
   /* ---------- chapter 04: bintang ---------- */
@@ -336,11 +349,21 @@
     var starBtn = $('#starNext');
     if (starBtn) starBtn.textContent = tpl(c.revealNext || 'Reveal the next star');
     totalEl.textContent = wishes.length;
+    var counterHTML = counter.innerHTML;                   // keadaan awal penghitung (ditimpa saat semua bintang ditemukan)
     text.textContent = tpl(c.idle || '');
     text.classList.add('is-idle');
 
     if (!window.Sky) return;
     window.Sky.setWishes(wishes.length);
+    resetters.push(function () {
+      found = {}; count = 0;
+      counter.innerHTML = counterHTML; countEl = $('#starCount'); totalEl = $('#starTotal');
+      text.classList.remove('swap'); text.textContent = tpl(c.idle || ''); text.classList.add('is-idle');
+      $('#next4').classList.remove('is-ready');
+      if (starBtn) starBtn.hidden = false;
+      window.Sky.setWishes(wishes.length);                 // bintang harapan kembali belum ditemukan
+      setTimeout(updateBand, 50);
+    });
     window.Sky.onPick = function (i) {
       text.classList.remove('swap');
       void text.offsetWidth; // memulai ulang animasi
@@ -403,6 +426,7 @@
       later(reduceMotion ? 120 : 2500, showReveal);
     });
 
+    $('#btnLeave').addEventListener('click', function () { if (finalState === 'revealed') next(); });   // ke halaman penutup
     $('#btnReplay').addEventListener('click', function () { goTo(0); });
     $('#btnStars').addEventListener('click', function () { goTo(idxOf('sky')); });
 
@@ -432,6 +456,34 @@
     }, 900);
   }
 
+  /* ---------- sisipan: Before You Leave (halaman penutup) ---------- */
+  function setupLeave() {
+    var t = $('#leaveText'), again = $('#btnAgain');
+    if (!t || !again) return;
+    var words = t.textContent.trim().split(/\s+/);          // pesan muncul kata demi kata; teks tetap utuh bagi pembaca layar
+    t.textContent = '';
+    words.forEach(function (w, i) {
+      var sp = el('span', 'lw', w);
+      sp.style.setProperty('--w', String(i));
+      t.appendChild(sp);
+      if (i < words.length - 1) t.appendChild(document.createTextNode(' '));
+    });
+    again.addEventListener('click', restart);
+  }
+
+  // "Experience It Again": kembali ke awal tanpa memuat ulang halaman. Kemajuan chapter dan tampilan tiap chapter dikembalikan;
+  // wish yang tersimpan, localStorage, dan pemutar musik TIDAK disentuh.
+  function restart() {
+    if (busy) return;
+    resetters.forEach(function (fn) { try { fn(); } catch (err) { console.error('[Letter] reset gagal:', err); } });
+    finalTimers.forEach(clearTimeout); finalTimers = [];
+    $('#envelope').classList.remove('is-open', 'is-out');
+    $('#envHint').classList.remove('is-hidden');
+    finalState = 'idle';
+    maxReached = 0;
+    goTo(0);
+  }
+
   /* ---------- sisipan: Make a Wish ---------- */
   function setupWish() {
     var c = cfgOf('wish');
@@ -448,6 +500,7 @@
     }
     function showError(msg) {
       err.textContent = msg;
+      err.classList.remove('is-in'); void err.offsetWidth; err.classList.add('is-in');   // pesan validasi muncul dengan animasi ringan
       input.setAttribute('aria-invalid', 'true');
       stage.classList.remove('is-shake'); void stage.offsetWidth; stage.classList.add('is-shake');
     }
@@ -502,13 +555,15 @@
       try { confirm.focus({ preventScroll: true }); } catch (e) { /* abaikan */ }
     }
 
-    more.addEventListener('click', function () {
+    function resetForm() {                                  // dipakai "Another wish" dan "Experience It Again"; tidak menyentuh wish tersimpan
+      clearTimeout(fallback); finished = false;
       input.value = ''; updateCount(); clearError();
       form.hidden = false; skip.hidden = false; done.hidden = true;
-      stage.classList.remove('is-done');
+      stage.classList.remove('is-done', 'is-sending');
       sending = false; btn.disabled = false; btn.removeAttribute('aria-busy'); input.readOnly = false;
-      input.focus();
-    });
+    }
+    more.addEventListener('click', function () { resetForm(); input.focus(); });
+    resetters.push(resetForm);
 
     updateCount();
   }
@@ -540,6 +595,7 @@
         if (open) { e.preventDefault(); closeMenu(true); }
         else if (window.Constellation && window.Constellation.isOpen()) { e.preventDefault(); window.Constellation.close(); }
         else if (window.Bottle && window.Bottle.isOpen()) { e.preventDefault(); window.Bottle.close(); }
+        else if (window.Moon && window.Moon.isOpen()) { e.preventDefault(); window.Moon.close(); }
         return;
       }
       if (e.altKey || e.ctrlKey || e.metaKey) return;
@@ -558,6 +614,7 @@
       if (isTyping(e.target)) return;
       if (window.Constellation && window.Constellation.isOpen()) return;
       if (window.Bottle && window.Bottle.isOpen()) return;
+      if (window.Moon && window.Moon.isOpen()) return;
       if (e.key === 'ArrowLeft') goTo(current - 1);
       else if (e.key === 'ArrowRight' && current + 1 <= maxReached) goTo(current + 1);
     });
@@ -594,7 +651,9 @@
       setupWish();
       if (window.Constellation) window.Constellation.init();
       if (window.Bottle) window.Bottle.init();
+      if (window.Moon) window.Moon.init();
       setupFinal();
+      setupLeave();
       checkConfig();
       var bandTimer = 0;
       var refreshBand = function () { clearTimeout(bandTimer); bandTimer = setTimeout(updateBand, 200); };

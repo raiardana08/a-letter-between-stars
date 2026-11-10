@@ -161,6 +161,22 @@ window.LETTER_CONFIG = {
     next: "Continue"
   },
 
+  /* ================= SISIPAN — A MESSAGE FROM THE MOON ================== */
+  /* Pesan-pesan bulan ada di js/moon.js (28 pesan, tanpa API dan tanpa internet).
+     Untuk memakai pesan Anda sendiri, hapus tanda komentar pada "messages" di bawah. Blok ini opsional. */
+  chapterMoon: {
+    label: "Moonlight",
+    title: "A Message from the Moon",
+    intro: "Sometimes, a little light is enough to remind us of something beautiful.",
+    hint: "Touch the moon to discover a message.",
+    moonLabel: "Touch the moon to discover a message",
+    panelTitle: "From the Moon",
+    another: "Another Message",
+    closeLabel: "Close",
+    next: "Continue"
+    // messages: ["Pesan pertama.", "Pesan kedua."]
+  },
+
   /* ============================ CHAPTER 05 ============================== */
   /* ================= SISIPAN — CONSTELLATION OF WISHES ================== */
   /* Setiap wish dari "Make a Wish" tampil sebagai satu bintang. Seluruh blok ini opsional:
@@ -197,7 +213,18 @@ window.LETTER_CONFIG = {
       "Wherever your days take you, I hope they are kind to you."
     ],
     footer: "{date}",
+    continueButton: "Continue",
     replayButton: "Read it again",
     backButton: "Back to the stars"
+  },
+
+  /* ============ SISIPAN — BEFORE YOU LEAVE (halaman penutup) ============ */
+  /* Halaman terakhir, tampil setelah Final Reveal. "again" mengulang pengalaman dari awal tanpa memuat ulang
+     halaman dan tanpa menghapus wish yang tersimpan. Blok ini opsional. */
+  chapterLeave: {
+    title: "Before You Leave...",
+    message: "Thank you for spending a little time beneath these stars. I hope you carry something beautiful with you, even after this night ends.",
+    closing: "Until we meet again, somewhere between the stars.",
+    again: "Experience It Again"
   }
 };

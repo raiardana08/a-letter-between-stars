@@ -186,7 +186,7 @@ body.is-loading .topbar { opacity: 0; pointer-events: none; }
 }
 .menu.is-open { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition-delay: 0s; }
 .menu__item { width: 100%; display: flex; align-items: baseline; gap: 14px; padding: 13px 14px; border-radius: 12px; text-align: left; min-height: 48px; transition: background .25s; }
-.menu__item:hover:not(:disabled) { background: rgba(248, 240, 235, .09); }
+@media (hover: hover) { .menu__item:hover:not(:disabled) { background: rgba(248, 240, 235, .09); } }
 .menu__item:disabled { opacity: .4; }
 .menu__item:focus-visible { background: rgba(248, 240, 235, .12); outline: 2px solid var(--blush); outline-offset: -2px; }
 .menu__item.is-current { background: rgba(233, 203, 195, .14); }
@@ -217,8 +217,9 @@ body.is-loading .topbar { opacity: 0; pointer-events: none; }
 }
 .btn.is-ready::after {
   content: ""; position: absolute; inset: -6px; border-radius: inherit;
-  border: 1px solid var(--accent); opacity: 0; animation: ring 2.6s ease-out infinite;
+  border: 1px solid var(--accent); opacity: 0;
 }
+.chapter.is-active .btn.is-ready::after { animation: ring 2.6s ease-out infinite; }
 
 /* Struktur umum chapter */
 .chapter {
@@ -366,9 +367,11 @@ body.is-loading .topbar { opacity: 0; pointer-events: none; }
   content: ""; position: absolute; bottom: -22px; left: 50%; width: 62%; height: 26px; transform: translateX(-50%);
   background: radial-gradient(closest-side, rgba(0, 0, 0, .38), transparent); pointer-events: none;
 }
-.env-glow { position: absolute; width: min(120vw, 560px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, rgba(201, 143, 145, .34), transparent); animation: breathe 5s ease-in-out infinite; pointer-events: none; }
+.env-glow { position: absolute; width: min(120vw, 560px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, rgba(201, 143, 145, .34), transparent); pointer-events: none; }
 
-.envelope { position: relative; width: min(78vw, 330px, 48vh); aspect-ratio: 3 / 2; perspective: 1000px; animation: float 6s ease-in-out infinite; -webkit-tap-highlight-color: transparent; }
+.envelope { position: relative; width: min(78vw, 330px, 48vh); aspect-ratio: 3 / 2; perspective: 1000px; -webkit-tap-highlight-color: transparent; }
+.chapter.is-active .env-glow { animation: breathe 5s ease-in-out infinite; }
+.chapter.is-active .envelope:not(.is-open) { animation: float 6s ease-in-out infinite; }
 .envelope > * { position: absolute; display: block; }
 .env-back  { inset: 0; border-radius: 4px; background: linear-gradient(180deg, #b77f83, #a56a70); z-index: 0; }
 .env-front { inset: 0; border-radius: 4px; z-index: 3; clip-path: polygon(0 100%, 0 0, 50% 62%, 100% 0, 100% 100%); background: linear-gradient(170deg, #f3dad2, #e5bfb7); }
@@ -391,7 +394,7 @@ body.is-loading .topbar { opacity: 0; pointer-events: none; }
 }
 .seal-moon { width: 18px; height: 18px; border-radius: 50%; box-shadow: inset -5px -2px 0 0 var(--ivory); transform: rotate(-15deg); }
 
-.envelope:hover:not(.is-open) .env-flap { transform: rotateX(16deg); }
+@media (hover: hover) { .envelope:hover:not(.is-open) .env-flap { transform: rotateX(16deg); } }
 .envelope.is-open { animation: none; cursor: default; }
 .envelope.is-open .env-flap { animation: flapOpen .95s var(--ease) forwards; }
 .envelope.is-open .env-seal { opacity: 0; transform: scale(.5); }
@@ -601,7 +604,7 @@ body.is-loading .topbar { opacity: 0; pointer-events: none; }
   /* gerak berulang berhenti */
   .loader__star, .envelope, .env-glow, .reveal__dust i, .eq i, .iconbtn.is-playing .eq i { animation: none !important; }
   .reveal__dust { display: none; }
-  .btn.is-ready::after { animation: none; opacity: .55; transform: none; }
+  .btn.is-ready::after, .chapter.is-active .btn.is-ready::after { animation: none; opacity: .55; transform: none; }
   .wish-stage.is-shake { animation: none; }
 
   /* masuk: hanya pudar, lebih singkat */
@@ -893,4 +896,294 @@ body.is-loading .topbar { opacity: 0; pointer-events: none; }
   .bpanel-wrap { transition: opacity .25s ease, visibility 0s linear .25s; }
   .bpanel-wrap.is-open { transition-delay: 0s; }
   .bpanel__body { transition: none; }
+}
+
+/* ==========================================================================
+   Sisipan: A Message from the Moon
+   Bulan dari SVG + CSS (tanpa gambar). Cahaya dibuat tertahan agar tidak berlebihan.
+   ========================================================================== */
+.chapter--moon { padding-bottom: calc(26px + var(--safe-bottom)); }
+.moon-wrap { width: 100%; max-width: 960px; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; }
+.chapter--moon .sky-top .ch-title { font-size: clamp(1.9rem, 8vw, 2.9rem); }
+.chapter--moon .sky-top .ch-intro { max-width: 34ch; }
+.mpanel-wrap [hidden] { display: none !important; }
+
+.moon-stage { position: relative; flex: 1 1 auto; width: 100%; min-height: 190px; margin: var(--sp-1) 0; }
+.moon-stars { position: absolute; inset: 0; pointer-events: none; }
+.moon-stars i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #FFF1E8; opacity: .55; box-shadow: 0 0 6px rgba(255, 233, 214, .7); }
+.moon-stars i:nth-child(1) { left: 14%; top: 18%; }
+.moon-stars i:nth-child(2) { left: 80%; top: 12%; width: 2px; height: 2px; }
+.moon-stars i:nth-child(3) { left: 90%; top: 52%; }
+.moon-stars i:nth-child(4) { left: 8%; top: 64%; width: 2px; height: 2px; }
+.moon-stars i:nth-child(5) { left: 24%; top: 86%; }
+.moon-stars i:nth-child(6) { left: 72%; top: 84%; width: 2px; height: 2px; }
+.moon-stars i:nth-child(7) { left: 62%; top: 6%; }
+.chapter.is-active .moon-stars i { animation: mtwinkle 4.8s ease-in-out infinite alternate; }
+.chapter.is-active .moon-stars i:nth-child(2n) { animation-duration: 6.2s; animation-delay: -2s; }
+.chapter.is-active .moon-stars i:nth-child(3n) { animation-duration: 5.4s; animation-delay: -3.4s; }
+
+.moonbtn {
+  position: absolute; top: 4%; bottom: 8%; left: 50%; transform: translateX(-50%);
+  aspect-ratio: 1; max-width: 78%; min-width: 64px; padding: 0; margin: 0;
+  background: none; border: 0; border-radius: 50%; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.moon__float { position: absolute; inset: 0; display: block; }
+.chapter.is-active .moon__float { animation: mfloat 8s ease-in-out infinite; }
+.moon__svg { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 22px rgba(248, 224, 210, .32)); }
+.moon__halo {
+  position: absolute; inset: -30%; border-radius: 50%; pointer-events: none; opacity: .55;
+  background: radial-gradient(circle, rgba(248, 224, 210, .30) 0, rgba(233, 203, 195, .12) 42%, transparent 68%);
+  transition: opacity .6s var(--ease), transform .6s var(--ease);
+}
+.moon__ring { position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(255, 238, 228, .65); opacity: 0; pointer-events: none; }
+@media (hover: hover) { .moonbtn:hover .moon__halo { opacity: .8; } }
+.moonbtn:focus-visible { outline: 2px solid var(--blush); outline-offset: 10px; }
+.moonbtn.is-lit .moon__halo { opacity: 1; transform: scale(1.12); }
+.moonbtn.is-lit .moon__ring { animation: mring .9s ease-out 1; }
+.moonbtn.is-lit .moon__svg { filter: drop-shadow(0 0 30px rgba(255, 238, 224, .5)); }
+
+.moon-hint { margin: 0; text-align: center; font: 500 .72rem var(--sans); letter-spacing: .26em; text-transform: uppercase; color: var(--fg-soft); }
+
+/* Panel pesan: kaca gelap, teks serif muncul kata demi kata */
+.mpanel-wrap {
+  position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center;
+  padding: 0 16px calc(24px + var(--safe-bottom));
+  background: linear-gradient(180deg, rgba(27, 25, 35, .15), rgba(27, 25, 35, .68));
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--dur-2) var(--ease-soft), visibility 0s linear var(--dur-2);
+}
+.mpanel-wrap.is-open { opacity: 1; visibility: visible; transition-delay: 0s; }
+.mpanel {
+  position: relative; width: 100%; max-width: 480px; max-height: min(76vh, 580px); overflow-y: auto; overscroll-behavior: contain;
+  padding: 2.2rem 1.6rem 1.6rem; border-radius: 20px; text-align: center; color: var(--ivory);
+  background: rgba(41, 38, 49, .82); border: 1px solid rgba(233, 203, 195, .28);
+  -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shine), 0 24px 60px rgba(0, 0, 0, .4), 0 0 44px rgba(248, 224, 210, .12);
+  transform: translateY(26px) scale(.98); opacity: 0;
+  transition: transform var(--dur-2) var(--ease), opacity var(--dur-2) ease;
+}
+.mpanel-wrap.is-open .mpanel { transform: none; opacity: 1; }
+.mpanel:focus { outline: none; }
+.mpanel__close { position: absolute; top: 10px; right: 10px; }
+.mpanel__moon { width: 24px; height: 24px; margin: 0 auto .6rem; color: #FFF1E8; filter: drop-shadow(0 0 9px rgba(248, 224, 210, .6)); }
+.mpanel__title { margin: 0 auto 1.1rem; padding: 0 1.6rem; font: 500 .72rem/1.5 var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--blush); }
+.mpanel__text { margin: 0; min-height: 4.4em; font: italic 500 clamp(1.4rem, 5.2vw, 1.7rem)/1.45 var(--serif); overflow-wrap: anywhere; text-wrap: pretty; }
+.mpanel__actions { margin-top: 1.4rem; }
+.mw { display: inline-block; }
+.mpanel__text.is-reveal .mw { animation: mword .7s var(--ease) both; animation-delay: calc(var(--w, 0) * 80ms + 120ms); }
+
+@keyframes mfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes mtwinkle { from { opacity: .25; } to { opacity: .85; } }
+@keyframes mring { 0% { opacity: .7; transform: scale(1); } 100% { opacity: 0; transform: scale(1.55); } }
+@keyframes mword { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+
+@media (min-width: 700px) {
+  .mpanel-wrap { align-items: center; padding-bottom: 0; }
+  .mpanel { padding: 2.6rem 2.4rem 2rem; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .chapter--moon { padding-bottom: calc(14px + var(--safe-bottom)); }
+  .moon-stage { min-height: 110px; margin: .2rem 0; }
+  .moon-hint { display: none; }
+  .mpanel-wrap { align-items: center; padding: 0 16px 8px; }
+  .mpanel { padding: 1.5rem 1.5rem 1rem; max-height: 88vh; }
+  .mpanel__moon { width: 18px; height: 18px; margin-bottom: .3rem; }
+  .mpanel__title { margin-bottom: .5rem; }
+  .mpanel__text { font-size: 1.25rem; min-height: 0; }
+  .mpanel__actions { margin-top: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chapter.is-active .moon__float, .chapter.is-active .moon-stars i, .moonbtn.is-lit .moon__ring { animation: none !important; }
+  .moon__halo { transition: opacity .25s ease; }
+  .moonbtn.is-lit .moon__halo { transform: none; }
+  .mpanel { transform: none; transition: opacity .25s ease; }
+  .mpanel-wrap { transition: opacity .25s ease, visibility 0s linear .25s; }
+  .mpanel-wrap.is-open { transition-delay: 0s; }
+  .mpanel__text.is-reveal .mw { animation: none; }
+}
+
+/* ==========================================================================
+   Sisipan: Before You Leave (halaman penutup, setelah Final Reveal)
+   Langit tengah malam, cahaya bulan lembut, teks muncul perlahan. Memakai token yang sudah ada.
+   ========================================================================== */
+.reveal .reveal__more { margin-top: .9rem; }
+
+.chapter--leave { justify-content: center; padding-bottom: calc(40px + var(--safe-bottom)); }
+.leave-sky { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.leave-moon {
+  position: absolute; left: 50%; top: calc(var(--top-h) + var(--safe-top) + 26px); width: clamp(64px, 20vw, 110px); aspect-ratio: 1; transform: translateX(-50%);
+  border-radius: 50%; opacity: .0;
+  background: radial-gradient(circle at 38% 34%, #FFF8F0, #F3DDD3 55%, #D9B6AE);
+  box-shadow: 0 0 40px 10px rgba(248, 224, 210, .22), 0 0 120px 40px rgba(233, 203, 195, .10);
+}
+.leave-sky i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #FFF1E8; opacity: .5; box-shadow: 0 0 7px rgba(255, 233, 214, .75); }
+.leave-sky i:nth-child(2) { left: 12%; top: 22%; }
+.leave-sky i:nth-child(3) { left: 84%; top: 18%; width: 2px; height: 2px; }
+.leave-sky i:nth-child(4) { left: 92%; top: 56%; }
+.leave-sky i:nth-child(5) { left: 6%; top: 62%; width: 2px; height: 2px; }
+.leave-sky i:nth-child(6) { left: 22%; top: 84%; }
+.leave-sky i:nth-child(7) { left: 76%; top: 86%; width: 2px; height: 2px; }
+.leave-sky i:nth-child(8) { left: 66%; top: 34%; width: 2px; height: 2px; }
+.leave-sky i:nth-child(9) { left: 34%; top: 40%; }
+
+.leave-wrap { position: relative; z-index: 1; width: 100%; max-width: 640px; margin: auto; padding-top: clamp(84px, 17vh, 150px); text-align: center; }
+.leave-title { margin: 0; font: italic 500 clamp(2.5rem, 11.5vw, 4.4rem)/1.1 var(--serif); color: var(--ivory); text-wrap: balance; }
+.leave-text { margin: 1.7rem auto 0; max-width: 32ch; font: 400 clamp(1.28rem, 4.7vw, 1.7rem)/1.62 var(--serif); color: var(--ivory); text-wrap: pretty; }
+.lw { display: inline-block; }
+.leave-closing { margin: 2.1rem auto 0; max-width: 28ch; font: italic 500 clamp(1.2rem, 4.4vw, 1.5rem)/1.5 var(--serif); color: var(--blush); text-wrap: balance; }
+.leave-actions { margin-top: 2.3rem; }
+
+/* Gerak hanya saat chapter aktif; satu kali, tanpa putaran tak berujung kecuali bintang yang sangat pelan */
+.chapter--leave .lv, .chapter--leave .lw { opacity: 0; }
+.chapter--leave.is-active .lv, .chapter--leave.is-leaving .lv { animation: lvIn 1.7s var(--ease) calc(var(--d, 0) * 1ms) both; }
+.chapter--leave.is-active .lw, .chapter--leave.is-leaving .lw { animation: lwIn 1.2s var(--ease) calc(1500ms + var(--w, 0) * 95ms) both; }
+.chapter--leave.is-active .leave-moon, .chapter--leave.is-leaving .leave-moon { animation: lmoonIn 3.2s var(--ease) .1s both; }
+.chapter--leave.is-active .leave-sky i { animation: lstar 11s ease-in-out infinite alternate; }
+.chapter--leave.is-active .leave-sky i:nth-child(2n) { animation-duration: 14s; animation-delay: -4s; }
+.chapter--leave.is-active .leave-sky i:nth-child(3n) { animation-duration: 9s; animation-delay: -7s; }
+
+@keyframes lvIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes lwIn { from { opacity: 0; transform: translateY(8px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes lmoonIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: .92; transform: translateX(-50%); } }
+@keyframes lstar { from { transform: translateY(0); opacity: .3; } to { transform: translateY(-7px); opacity: .85; } }
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .chapter--leave { padding-bottom: calc(18px + var(--safe-bottom)); }
+  .leave-moon { width: 44px; top: calc(var(--top-h) + var(--safe-top) + 8px); }
+  .leave-wrap { padding-top: 66px; }
+  .leave-title { font-size: clamp(1.9rem, 9vh, 2.6rem); }
+  .leave-text { margin-top: .8rem; font-size: 1.15rem; max-width: 46ch; line-height: 1.5; }
+  .leave-closing { margin-top: .9rem; font-size: 1.05rem; }
+  .leave-actions { margin-top: 1.1rem; }
+  .reveal .reveal__more { margin-top: .5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Teks tetap terbaca penuh tanpa animasi */
+  .chapter--leave .lv, .chapter--leave .lw { opacity: 1; animation: none !important; filter: none; transform: none; }
+  .chapter--leave .leave-moon { opacity: .92; animation: none !important; }
+  .chapter--leave .leave-sky i { animation: none !important; }
+}
+
+/* ==========================================================================
+   Phase 8: Premium UI/UX & Motion polish
+   Prinsip: gerak elegan, bukan kartun. Hanya transform/opacity. Pantulan ("spring")
+   dibuat dengan kurva overshoot singkat; tombol 180-350 ms, kartu ~460 ms, panel 260-440 ms.
+   Tidak ada perulangan baru. Blok reduced-motion di akhir memadamkan semua pantulan.
+   ========================================================================== */
+:root {
+  --spring: cubic-bezier(.34, 1.7, .5, 1);        /* tombol: pantulan elastis singkat saat dilepas */
+  --spring-soft: cubic-bezier(.3, 1.16, .6, 1);   /* kartu, panel, menu: pantulan halus */
+  --dur-press: .12s;                               /* ditekan: cepat */
+  --dur-bounce: .34s;                              /* dilepas: pantulan */
+  --dur-enter: .46s;                               /* masuk kartu */
+  --sheen: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0) 42%);
+}
+
+/* ----- Latar: vinyet statis agar kedalaman terasa tanpa menambah gerak ----- */
+.bg-dusk::after, .bg-night::after, .bg-final::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(130% 95% at 50% 42%, transparent 58%, rgba(12, 10, 18, .34) 100%);
+}
+
+/* ----- Kaca: kilau halus yang seragam di semua permukaan kaca ----- */
+.wishcard, .wishdone, .cpanel, .mpanel, .menu { background-image: var(--sheen); }
+.wishcard, .wishdone { border-radius: 20px; }
+
+/* ----- A. Tombol ----- */
+.btn {
+  transition: transform var(--dur-bounce) var(--spring), box-shadow .3s var(--ease), background .3s, color .8s;
+}
+.btn:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: scale(.95);
+  transition: transform var(--dur-press) var(--ease), box-shadow var(--dur-press) ease, background .3s, color .8s;
+}
+.iconbtn {
+  transition: background var(--dur-1), opacity .4s, transform var(--dur-bounce) var(--spring), border-color var(--dur-1), box-shadow var(--dur-1);
+}
+.iconbtn:active:not(:disabled) {
+  transform: scale(.9);
+  transition: transform var(--dur-press) var(--ease), background var(--dur-1), opacity .4s, border-color var(--dur-1), box-shadow var(--dur-press);
+}
+.navbtn, .textbtn { transition: transform var(--dur-bounce) var(--spring), color .25s ease; }
+.navbtn:active, .textbtn:active:not(:disabled) { transform: scale(.96); transition: transform var(--dur-press) var(--ease), color .25s ease; }
+@media (hover: hover) { .iconbtn:hover:not(:disabled) { transform: translateY(-1px); } }
+
+/* ----- D. Navigasi ----- */
+.dots i { transition: opacity .4s var(--ease), width .45s var(--spring-soft), border-radius .3s ease, background .3s ease; }
+@keyframes navSwap { from { opacity: 0; translate: 0 4px; } to { opacity: 1; translate: 0 0; } }
+.navbtn__label.is-swap { animation: navSwap .36s var(--ease) both; }
+.menu { transition: opacity .25s ease, transform .4s var(--spring-soft), visibility 0s linear .3s; }
+.menu.is-open { transition-delay: 0s; }
+@keyframes menuItemIn { from { opacity: 0; translate: 0 -6px; } to { opacity: 1; translate: 0 0; } }
+.menu.is-open .menu__list li { animation: menuItemIn .32s var(--ease) both; }
+.menu.is-open .menu__list li:nth-child(2) { animation-delay: .03s; }
+.menu.is-open .menu__list li:nth-child(3) { animation-delay: .06s; }
+.menu.is-open .menu__list li:nth-child(4) { animation-delay: .09s; }
+.menu.is-open .menu__list li:nth-child(5) { animation-delay: .12s; }
+.menu.is-open .menu__list li:nth-child(6) { animation-delay: .15s; }
+.menu.is-open .menu__list li:nth-child(7) { animation-delay: .18s; }
+.menu.is-open .menu__list li:nth-child(8) { animation-delay: .21s; }
+.menu.is-open .menu__list li:nth-child(9) { animation-delay: .24s; }
+.menu.is-open .menu__list li:nth-child(10) { animation-delay: .27s; }
+.menu__item { transition: background .25s, transform .3s var(--spring-soft); }
+.menu__item:active:not(:disabled) { transform: scale(.98); background: rgba(248, 240, 235, .14); transition: background .12s, transform var(--dur-press) var(--ease); }
+
+/* ----- B. Kartu: masuk dengan pantulan halus, terangkat saat hover, tetap bisa dibalik ----- */
+@keyframes cardIn {
+  0%   { opacity: 0; translate: 0 22px; scale: .96; }
+  62%  { opacity: 1; translate: 0 -4px; scale: 1.012; }
+  100% { opacity: 1; translate: 0 0; scale: 1; }
+}
+.chapter.is-active .card, .chapter.is-leaving .card {
+  animation: cardIn var(--dur-enter) var(--ease) both;
+  animation-delay: calc(1050ms + var(--ci, 0) * 110ms);
+}
+.card:nth-child(1) { --ci: 0; } .card:nth-child(2) { --ci: 1; } .card:nth-child(3) { --ci: 2; } .card:nth-child(4) { --ci: 3; }
+.card { transition: transform .42s var(--spring-soft); }
+.card:active { transition: transform var(--dur-press) var(--ease); }
+.card__face { transition: box-shadow .35s var(--ease); }
+@media (hover: hover) { .card:hover .card__face { box-shadow: 0 20px 36px rgba(96, 74, 73, .2); } }
+
+/* ----- C. Elemen interaktif ----- */
+.moon__svg { transition: transform .4s var(--spring-soft), filter .5s ease; }
+.moonbtn:active .moon__svg { transform: scale(.96); transition-duration: var(--dur-press); }
+@keyframes mbounce { 0% { transform: scale(1); } 22% { transform: scale(.93); } 58% { transform: scale(1.04); } 100% { transform: scale(1); } }
+.moonbtn.is-lit .moon__svg { animation: mbounce .5s var(--ease) both; }
+
+.bottle__svg { transition: transform .4s var(--spring-soft); transform-origin: 50% 70%; }
+.bottle:active .bottle__svg { transform: scale(.97); transition-duration: var(--dur-press); }
+@keyframes bbounce { 0% { transform: scale(1); } 25% { transform: scale(.96, 1.03); } 60% { transform: scale(1.025, .985); } 100% { transform: scale(1); } }
+.bottle.is-opening .bottle__svg { animation: bbounce .55s var(--ease) both; }
+
+.cstar__core { transition: transform .4s var(--spring-soft); }
+.cstar:active .cstar__core { transform: scale(.85); transition-duration: var(--dur-press); }
+
+/* Panel (modal, surat, pesan bulan): masuk dengan pantulan halus, keluar lebih cepat */
+.cpanel, .mpanel, .bpanel { transition: transform .26s var(--ease-soft), opacity .2s ease; }
+.cpanel-wrap.is-open .cpanel, .mpanel-wrap.is-open .mpanel, .bpanel-wrap.is-open .bpanel { transition: transform .42s var(--spring-soft), opacity .28s ease; }
+
+/* ----- E. Form ----- */
+.wishcard__input { transition: border-color var(--dur-1), box-shadow var(--dur-1), background-color var(--dur-1), transform .3s var(--spring-soft); }
+.wishcard__input:focus { background-color: rgba(27, 25, 35, .66); transform: translateY(-1px); }
+@keyframes errIn { from { opacity: 0; translate: 0 -5px; } to { opacity: 1; translate: 0 0; } }
+.wishcard__error.is-in { animation: errIn .3s var(--ease) both; }
+.wishcard__count { transition: color .25s ease; }
+
+/* ----- Reduced motion: tanpa pantulan; umpan balik tetap lewat pudar/kecerahan ----- */
+@media (prefers-reduced-motion: reduce) {
+  :root { --spring: ease-out; --spring-soft: ease-out; --dur-bounce: .2s; }
+  @keyframes cardIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes menuItemIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes navSwap { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes errIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes mbounce { from { opacity: .8; } to { opacity: 1; } }
+  @keyframes bbounce { from { opacity: .85; } to { opacity: 1; } }
+  .btn:active:not(:disabled):not([aria-disabled="true"]), .iconbtn:active:not(:disabled), .navbtn:active, .textbtn:active:not(:disabled),
+  .menu__item:active:not(:disabled), .card:active, .moonbtn:active .moon__svg, .bottle:active .bottle__svg, .cstar:active .cstar__core { transform: none; filter: brightness(.92); }
+  .iconbtn:hover:not(:disabled), .wishcard__input:focus { transform: none; }
+  .card, .card:hover { transform: none; }
+  .menu { transform: translate(-50%, 0); }
+  .cpanel, .mpanel, .bpanel { transform: none; transition: opacity .25s ease; }
+  .cpanel-wrap.is-open .cpanel, .mpanel-wrap.is-open .mpanel, .bpanel-wrap.is-open .bpanel { transition: opacity .25s ease; }
+  .dots i { transition: opacity .3s ease, background .3s ease; }
 }

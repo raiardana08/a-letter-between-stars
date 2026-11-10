@@ -319,6 +319,62 @@
       </div>
     </section>
 
+    <!-- ============ SISIPAN — A MESSAGE FROM THE MOON ============ -->
+    <section class="chapter chapter--moon" id="chMoon" data-key="moon" data-interlude tabindex="-1" aria-labelledby="tMoon">
+      <div class="moon-wrap" id="moonMain">
+        <div class="sky-top">
+          <p class="eyebrow rise" style="--d:0" data-t="chapterMoon.label"></p>
+          <h2 class="ch-title rise" style="--d:120" id="tMoon" data-t="chapterMoon.title"></h2>
+          <p class="ch-intro rise" style="--d:260" data-t="chapterMoon.intro"></p>
+        </div>
+
+        <div class="moon-stage rise" style="--d:500" id="moonStage">
+          <div class="moon-stars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <button class="moonbtn" id="moonBtn" type="button" aria-haspopup="dialog" data-t-attr="aria-label:chapterMoon.moonLabel">
+            <span class="moon__halo" aria-hidden="true"></span>
+            <span class="moon__ring" aria-hidden="true"></span>
+            <span class="moon__float">
+              <svg class="moon__svg" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+                <defs>
+                  <radialGradient id="mBody" cx="38%" cy="34%" r="75%">
+                    <stop offset="0" stop-color="#FFF8F0"/>
+                    <stop offset=".55" stop-color="#F3DDD3"/>
+                    <stop offset="1" stop-color="#D9B6AE"/>
+                  </radialGradient>
+                  <radialGradient id="mCrater" cx="35%" cy="30%" r="80%">
+                    <stop offset="0" stop-color="#987D78" stop-opacity=".10"/>
+                    <stop offset="1" stop-color="#987D78" stop-opacity=".34"/>
+                  </radialGradient>
+                  <clipPath id="mClip"><circle cx="100" cy="100" r="86"/></clipPath>
+                </defs>
+                <circle cx="100" cy="100" r="86" fill="url(#mBody)"/>
+                <g clip-path="url(#mClip)">
+                  <circle cx="68" cy="72" r="17" fill="url(#mCrater)"/>
+                  <circle cx="128" cy="62" r="9" fill="url(#mCrater)"/>
+                  <circle cx="134" cy="116" r="22" fill="url(#mCrater)"/>
+                  <circle cx="84" cy="136" r="12" fill="url(#mCrater)"/>
+                  <circle cx="52" cy="112" r="6" fill="url(#mCrater)"/>
+                  <circle cx="108" cy="92" r="5" fill="url(#mCrater)"/>
+                  <circle cx="112" cy="152" r="7" fill="url(#mCrater)"/>
+                  <circle cx="150" cy="86" r="4" fill="url(#mCrater)"/>
+                  <circle cx="132" cy="108" r="80" fill="#604A49" opacity=".05"/>
+                </g>
+                <circle cx="100" cy="100" r="85.5" fill="none" stroke="#fff" stroke-opacity=".35"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+        <p class="moon-hint rise" style="--d:650" id="moonHint" data-t="chapterMoon.hint"></p>
+
+        <div class="const-bottom">
+          <button class="btn btn--primary js-next rise" style="--d:800" id="nextMoon" type="button">
+            <span data-t="chapterMoon.next"></span>
+            <svg class="ico ico--sm"><use href="#i-arrow"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ CHAPTER 05 — THE FINAL REVEAL ============ -->
     <section class="chapter" id="ch5" data-key="reveal" tabindex="-1" aria-labelledby="t5">
       <div class="wrap wrap--center">
@@ -340,6 +396,24 @@
         </div>
 
         <p class="env-hint rise" style="--d:1000" id="envHint" data-t="chapter5.hint"></p>
+      </div>
+    </section>
+
+    <!-- ============ SISIPAN — BEFORE YOU LEAVE (halaman penutup, setelah Final Reveal) ============ -->
+    <section class="chapter chapter--leave" id="chLeave" data-key="leave" data-interlude tabindex="-1" aria-labelledby="tLeave">
+      <div class="leave-sky" aria-hidden="true">
+        <span class="leave-moon"></span>
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+      <div class="leave-wrap">
+        <h2 class="leave-title lv" style="--d:500" id="tLeave" data-t="chapterLeave.title"></h2>
+        <p class="leave-text" id="leaveText" data-t="chapterLeave.message"></p>
+        <p class="leave-closing lv" style="--d:5400" data-t="chapterLeave.closing"></p>
+        <div class="actions leave-actions lv" style="--d:6800">
+          <button class="btn btn--primary" id="btnAgain" type="button">
+            <span data-t="chapterLeave.again"></span>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -375,6 +449,24 @@
       </div>
     </div>
 
+    <!-- Panel pesan (A Message from the Moon) -->
+    <div class="mpanel-wrap" id="mPanelWrap" aria-hidden="true" inert>
+      <div class="mpanel" id="mPanel" role="dialog" aria-modal="true" aria-labelledby="mpTitle" aria-describedby="mpText" tabindex="-1">
+        <button class="iconbtn mpanel__close" id="mpClose" type="button" data-t-attr="aria-label:chapterMoon.closeLabel">
+          <svg class="ico"><use href="#i-close"/></svg>
+        </button>
+        <svg class="mpanel__moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="currentColor"/></svg>
+        <h2 class="mpanel__title" id="mpTitle" data-t="chapterMoon.panelTitle"></h2>
+        <p class="mpanel__text" id="mpText" aria-live="polite"></p>
+        <div class="actions mpanel__actions">
+          <button class="btn btn--primary" id="mpAnother" type="button">
+            <span data-t="chapterMoon.another"></span>
+            <svg class="ico ico--sm"><use href="#i-star"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Pengungkapan akhir (di atas chapter 5) -->
     <div class="reveal" id="reveal" aria-hidden="true" role="region" aria-labelledby="rvLine" tabindex="-1">
       <div class="reveal__dust" id="revealDust" aria-hidden="true"></div>
@@ -384,8 +476,14 @@
         <p class="r r2" id="senderName"></p>
         <div class="r r3 reveal__closing" id="rvClosing"></div>
         <p class="r r3 reveal__date" id="rvDate"></p>
-        <div class="r r4 actions actions--row">
-          <button class="btn btn--primary" id="btnReplay" type="button"><span data-t="chapter5.replayButton"></span></button>
+        <div class="r r4 actions">
+          <button class="btn btn--primary" id="btnLeave" type="button">
+            <span data-t="chapter5.continueButton"></span>
+            <svg class="ico ico--sm"><use href="#i-arrow"/></svg>
+          </button>
+        </div>
+        <div class="r r4 actions actions--row reveal__more">
+          <button class="btn btn--ghost" id="btnReplay" type="button"><span data-t="chapter5.replayButton"></span></button>
           <button class="btn btn--ghost" id="btnStars" type="button"><span data-t="chapter5.backButton"></span></button>
         </div>
       </div>
@@ -400,6 +498,7 @@
   <script src="js/wishes.js"></script>
   <script src="js/constellation.js"></script>
   <script src="js/bottle.js"></script>
+  <script src="js/moon.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
