@@ -9,7 +9,9 @@
   if (!CFG) {
     console.error('[Letter] config.js tidak ditemukan atau gagal dimuat.');
     var ld = document.getElementById('loader');
-    if (ld) ld.hidden = true;
+    var lt = ld && ld.querySelector('.loader__text');
+    if (lt) lt.textContent = 'config.js not found. Make sure config.js is uploaded next to index.html.';   // pesan jelas, bukan layar kosong
+    else if (ld) ld.hidden = true;
     return;
   }
 
@@ -634,6 +636,40 @@
     });
   }
 
+
+  /* ---------- magnetik halus (hanya pointer halus + hover; mati saat reduced-motion) ---------- */
+  function setupMagnetic() {
+    var mq = window.matchMedia;
+    if (!mq || !mq('(hover: hover) and (pointer: fine)').matches || mq('(prefers-reduced-motion: reduce)').matches) return;
+    var items = [], raf = 0, px = -9999, py = -9999;
+    ['#btnBegin', '.btn--primary', '#moonBtn', '#bottleBtn', '#envelope'].forEach(function (sel) {
+      Array.prototype.forEach.call(document.querySelectorAll(sel), function (el) {
+        if (!items.some(function (i) { return i.el === el; })) { items.push({ el: el, x: 0, y: 0 }); el.classList.add('is-magnetic'); }
+      });
+    });
+    function frame() {
+      raf = 0; var busy = false;
+      items.forEach(function (it) {
+        var el = it.el, tx = 0, ty = 0;
+        if (el.offsetWidth && !el.closest('[inert]') && !el.disabled && getComputedStyle(el).visibility !== 'hidden') {
+          var r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+          var dx = px - cx, dy = py - cy, reach = Math.max(r.width, r.height) * 0.75 + 36;
+          if (dx * dx + dy * dy < reach * reach) { tx = Math.max(-5, Math.min(5, dx * 0.1)); ty = Math.max(-5, Math.min(5, dy * 0.1)); }
+        }
+        it.x += (tx - it.x) * 0.18; it.y += (ty - it.y) * 0.18;
+        if (Math.abs(it.x) < 0.05 && Math.abs(it.y) < 0.05 && !tx && !ty) { if (el.style.translate) el.style.translate = ''; it.x = it.y = 0; }
+        else { el.style.translate = it.x.toFixed(2) + 'px ' + it.y.toFixed(2) + 'px'; busy = true; }
+      });
+      if (busy) raf = requestAnimationFrame(frame);
+    }
+    document.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      px = e.clientX; py = e.clientY;
+      if (!raf) raf = requestAnimationFrame(frame);
+    }, { passive: true });
+    document.addEventListener('pointerleave', function () { px = py = -9999; if (!raf) raf = requestAnimationFrame(frame); });
+  }
+
   /* ---------- mulai ---------- */
   function boot() {
     try {
@@ -654,6 +690,7 @@
       if (window.Moon) window.Moon.init();
       setupFinal();
       setupLeave();
+      setupMagnetic();
       checkConfig();
       var bandTimer = 0;
       var refreshBand = function () { clearTimeout(bandTimer); bandTimer = setTimeout(updateBand, 200); };

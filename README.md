@@ -2,6 +2,31 @@
 
 HTML + CSS + JavaScript murni. Tidak ada build, backend, atau API.
 
+## Mulai di sini (versi final, Phase 9)
+
+### 1. Isi konfigurasi personal (wajib sebelum dikirim)
+Semua ada di **`config.js`**. Placeholder bawaan sengaja dibiarkan; situs tetap berjalan tanpa error jika belum diganti (konsol hanya mencetak info daftar yang belum diganti).
+
+| Konfigurasi | Lokasi | Nilai saat ini | Tindakan |
+|---|---|---|---|
+| Nama penerima | `config.js` → `recipientName` (baris 28) | `[NAMA_PENERIMA]` | Perlu diisi |
+| Nama pengirim | `config.js` → `senderName` (baris 29) | `[NAMA_PENGIRIM]` | Perlu diisi |
+| Pesan personal | `config.js` → `personalMessage` (baris 30) | `[PESAN_PERSONAL]` | Perlu diisi |
+| Kenangan | `config.js` → `memory` (baris 31) | `[KENANGAN]` | Perlu diisi |
+| Tanggal spesial | `config.js` → `specialDate` (baris 32) | `[TANGGAL_SPESIAL]` | Perlu diisi |
+| Tanda tangan surat (opsional) | `config.js` → `chapter3.signature` | `someone, quietly` | Boleh dibiarkan atau diganti |
+
+Catatan: jangan dikosongkan (`""`); surat akan menampilkan "Dear ," dan "Written on" tanpa isi. Karakter khusus/HTML di nilai config ditampilkan sebagai teks biasa (aman). Jika `config.js` gagal dimuat, layar menampilkan pesan "config.js not found" (bukan layar kosong).
+
+### 2. Musik
+`assets/music.mp3` dipakai lewat `config.js` → `music.src`. Volume diatur dari `music.volume` (0–1, default 0,15); tidak ada slider volume di antarmuka. Musik tidak pernah berbunyi sebelum sentuhan pengunjung; `autoStartOnFirstJourney` memulainya saat tombol pembuka disentuh. Jika file hilang/kosong, musik ambient bawaan (WebAudio) dipakai.
+
+### 3. Upload ke GitHub Pages (manual)
+Lihat bagian "Deploy ke GitHub Pages" di bawah. Pastikan `config.js`, `css/`, `js/`, `assets/`, dan `.nojekyll` ikut terunggah di root bersama `index.html` (nama file huruf kecil semua; GitHub Pages membedakan huruf besar/kecil).
+
+### 4. Status QA
+Ringkasan hasil uji ada di laporan Phase 9. Pengujian pada perangkat nyata (HP Android, screen reader, audio dengan telinga) belum dilakukan dan perlu dicoba sendiri sebelum dikirim.
+
 ## Struktur
 ```
 index.html        kerangka halaman
@@ -56,7 +81,7 @@ Alamat bisa membocorkan identitas pengirim: hindari nama asli di username atau n
 - Saat panel terbuka, area konstelasi, bar atas (kembali/menu/musik) dan menu chapter dibuat `inert`; panel berada di atas semuanya (z-index 40).
 
 ## Wish in a Bottle
-- Chapter interlude setelah Constellation (urutan: Make a Wish -> Constellation -> Wish in a Bottle -> Final Reveal).
+- Chapter interlude setelah Constellation (urutan: Make a Wish -> Constellation -> Wish in a Bottle -> A Message from the Moon -> Final Reveal).
 - Botol digambar dengan SVG + CSS (tanpa gambar). Ketuk botol: gabus terangkat, gulungan naik, lalu panel surat terbuka berisi satu wish dan tanggalnya.
 - Jika wish lebih dari satu: tombol sebelumnya/berikutnya atau panah kiri/kanan. Pembukaan botol berikutnya selalu memilih wish yang berbeda dari yang terakhir dibaca. Hanya satu wish tampil sekali waktu.
 - **Tidak ada penyimpanan baru**: hanya memanggil `Wishes.all()` dan mendengarkan `wishes:changed`, sama seperti Constellation. Wish tidak disalin atau dihapus.
@@ -89,3 +114,21 @@ Penyempurnaan visual dan gerak tanpa fitur baru. File berubah: `css/style.css` (
 - Form: transisi fokus textarea, pesan validasi beranimasi ringan.
 - Performa: animasi tak-berhenti (amplop, cincin tombol) hanya berjalan di chapter aktif.
 - `prefers-reduced-motion`: tanpa overshoot/skala/gerak, hanya pudar/kecerahan.
+
+### Phase 8b — Celestial Signature (tambahan)
+- Token desain tambahan: skala tipografi fluida (`--fs-*`), radius (`--r-*`), elevasi (`--elev-*`), safe-area kiri/kanan; breakpoint acuan didokumentasikan di CSS.
+- Magnetik halus (`setupMagnetic` di `js/main.js`): maks. 5 px, hanya pointer mouse + hover, mati di layar sentuh dan saat reduced-motion; memakai properti `translate`, tidak mengubah area klik.
+- Floating tidak serempak (bintang bulan, bulan, botol); amplop punya umpan balik tekan; kartu sukses wish masuk dengan pantulan halus; judul chapter memudar dari blur kecil.
+
+## Phase 8c — Final Experience Polish
+Perubahan hanya CSS (`css/style.css`, blok "Phase 8c") dan tiga nilai `--d` pada chapter Before You Leave di `index.html`. Teks, mekanisme reveal, restart, penyimpanan wish, dan audio tidak berubah.
+- **Final Reveal:** sinar bulan lembut (muncul sekali, tanpa loop), vinyet hangat, judul/nama masuk dengan blur sinematik, urutan dipadatkan (semua terbaca penuh ~7,5 s, sebelumnya ~9,8 s), hierarki teks lebih jelas.
+- **Before You Leave:** pacing dipadatkan (semua terlihat ~7 s, sebelumnya ~8,5 s), pemisah halus sebelum kalimat penutup, tombol lebih menonjol dengan bayangan lembut. Tinggi tata letak tidak berubah agar layar pendek tetap muat.
+- **Panel detail wish (Constellation):** kaca bergradasi dengan sorot cahaya atas, judul bergaya eyebrow, teks lebih nyaman dibaca, pemisah + tanggal. Teks wish tetap plain text (`textContent`).
+- Catatan: panel Constellation tidak punya tombol sebelumnya/berikutnya (hanya panel botol yang punya); tidak ditambahkan karena itu fitur baru.
+
+## Deploy ke GitHub Pages
+1. Buat repository GitHub dan unggah **isi** folder proyek (bukan folder pembungkusnya) ke root: `index.html`, `config.js`, `css/`, `js/`, `assets/`, `.nojekyll`.
+2. Settings → Pages → Source: *Deploy from a branch*, Branch: `main`, folder `/ (root)`.
+3. Tunggu 1–2 menit, buka `https://<username>.github.io/<repo>/`.
+4. Semua path relatif; wish tersimpan per browser (localStorage), tidak tersinkron antar perangkat.

@@ -1187,3 +1187,135 @@ body.is-loading .topbar { opacity: 0; pointer-events: none; }
   .cpanel-wrap.is-open .cpanel, .mpanel-wrap.is-open .mpanel, .bpanel-wrap.is-open .bpanel { transition: opacity .25s ease; }
   .dots i { transition: opacity .3s ease, background .3s ease; }
 }
+
+/* ==========================================================================
+   Phase 8b: Design system tokens, floating desinkron, amplop, sukses wish,
+   transisi sinematik ringan, safe-area. Hanya tambahan; tidak mengubah fitur.
+   Breakpoint acuan: 360 (kecil) · 480 (ponsel) · 768 (tablet) · 1100 (desktop);
+   landscape pendek: (orientation: landscape) and (max-height: 520px).
+   ========================================================================== */
+:root {
+  /* skala tipografi fluida */
+  --fs-xs: .72rem; --fs-sm: .875rem; --fs-md: 1rem;
+  --fs-lg: clamp(1.2rem, 4.4vw, 1.5rem); --fs-xl: clamp(1.7rem, 7vw, 2.2rem); --fs-2xl: clamp(2.5rem, 11.5vw, 4.4rem);
+  /* radius */
+  --r-sm: 10px; --r-md: 16px; --r-lg: 20px; --r-pill: 999px;
+  /* elevasi */
+  --elev-1: 0 2px 8px rgba(0, 0, 0, .14);
+  --elev-2: 0 10px 28px rgba(0, 0, 0, .22);
+  --elev-3: 0 22px 48px rgba(0, 0, 0, .3);
+  /* tepi sudut aman (landscape berlekuk) */
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+.chapter { padding-left: max(22px, var(--safe-left)); padding-right: max(22px, var(--safe-right)); }
+@media (orientation: landscape) and (max-height: 520px) {
+  .chapter { padding-left: max(24px, var(--safe-left)); padding-right: max(24px, var(--safe-right)); }
+}
+
+/* Floating: tidak serempak (durasi & fase berbeda); hanya di chapter aktif */
+.chapter.is-active .moon-stars i:nth-child(1) { animation-duration: 4.1s; animation-delay: -1s; }
+.chapter.is-active .moon-stars i:nth-child(2) { animation-duration: 5.6s; animation-delay: -3.2s; }
+.chapter.is-active .moon-stars i:nth-child(3) { animation-duration: 6.3s; animation-delay: -.4s; }
+.chapter.is-active .moon-stars i:nth-child(4) { animation-duration: 4.7s; animation-delay: -2.4s; }
+.chapter.is-active .moon-stars i:nth-child(5) { animation-duration: 5.2s; animation-delay: -4.1s; }
+.chapter.is-active .moon-stars i:nth-child(6) { animation-duration: 6.9s; animation-delay: -1.7s; }
+.chapter.is-active .moon-stars i:nth-child(7) { animation-duration: 3.9s; animation-delay: -2.9s; }
+.chapter.is-active .moon__float { animation-delay: -2.5s; }
+.chapter.is-active .bottle__float { animation-delay: -1.3s; }
+
+/* Amplop: umpan balik taktil (pakai properti `scale` agar tidak bentrok dengan animasi float) */
+.envelope { transition: scale .34s var(--spring-soft); }
+.envelope:active:not(.is-open) { scale: .975; transition-duration: var(--dur-press); transition-timing-function: var(--ease); }
+.env-letter { transition: transform .8s var(--ease), box-shadow .8s ease; }
+.envelope.is-out .env-letter { box-shadow: 0 18px 38px rgba(96, 74, 73, .24); }
+
+/* Sukses wish: masuk dengan pantulan halus (menggantikan hanya nama animasi, durasi tetap <= 0,9 s) */
+@keyframes doneIn {
+  0% { opacity: 0; transform: translateY(10px) scale(.97); }
+  60% { opacity: 1; transform: translateY(-2px) scale(1.008); }
+  100% { opacity: 1; transform: none; }
+}
+.wishdone { animation: doneIn .7s var(--ease) both; }
+
+/* Transisi sinematik ringan: judul memudar dari blur kecil (hanya teks pendek) */
+@keyframes riseBlur { from { opacity: 0; translate: 0 16px; filter: blur(6px); } to { opacity: 1; translate: 0 0; filter: blur(0); } }
+.chapter.is-active .ch-title.rise, .chapter.is-active .headline.rise { animation-name: riseBlur; }
+
+/* Magnetik (hanya pointer halus; ditulis JS lewat properti `translate`, tanpa transisi) */
+.is-magnetic { will-change: translate; }
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes doneIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes riseBlur { from { opacity: 0; } to { opacity: 1; } }
+  .envelope, .env-letter { transition: opacity .25s ease; }
+  .envelope:active:not(.is-open) { scale: none; filter: brightness(.94); }
+  .is-magnetic { translate: none !important; }
+}
+
+/* ==========================================================================
+   Phase 8c: Final Reveal (puncak emosional), Before You Leave (penutup),
+   panel detail wish (pesan kaca). Hanya CSS + tiga nilai --d di index.html.
+   ========================================================================== */
+
+/* ---- Final Reveal: cahaya bulan halus, urutan lebih rapat, fokus pada teks utama ---- */
+@keyframes revealLight { from { opacity: 0; transform: scale(.82); } to { opacity: 1; transform: scale(1); } }
+@keyframes revealBlur { from { opacity: 0; translate: 0 14px; filter: blur(9px); } to { opacity: 1; translate: 0 0; filter: blur(0); } }
+.reveal__inner::before {                       /* sinar bulan di belakang bulan & judul; sekali muncul, lalu diam */
+  content: ""; position: absolute; z-index: -1; left: 50%; top: -6%; width: min(130vw, 560px); aspect-ratio: 1; margin-left: calc(min(130vw, 560px) / -2);
+  background: radial-gradient(closest-side, rgba(255, 252, 247, .95), rgba(255, 244, 236, .5) 55%, transparent);
+  opacity: 0; pointer-events: none;
+}
+.reveal.show .reveal__inner::before { animation: revealLight 2.6s var(--ease) .2s both; }
+.reveal::after {                               /* kedalaman: tepi layar sedikit lebih hangat; tidak menutup teks */
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(201, 143, 145, .13));
+}
+.reveal.show .r { animation-duration: 1.5s; }
+.reveal.show .r0 { animation-delay: .4s; }
+.reveal.show .r1 { animation-delay: 1.0s; animation-name: revealBlur; animation-duration: 1.8s; }
+.reveal.show .r2 { animation-delay: 2.3s; animation-name: revealBlur; }
+.reveal.show .r3 { animation-delay: 3.6s; }
+.reveal.show .r4 { animation-delay: 4.9s; }
+.r1 { text-shadow: 0 2px 28px rgba(255, 250, 244, .9); }
+.r2 { letter-spacing: .005em; }
+.reveal__closing p { font-size: clamp(1.22rem, 4.6vw, 1.4rem); line-height: 1.6; color: var(--mauve); text-wrap: balance; }
+.reveal__date { letter-spacing: .26em; }
+
+/* ---- Before You Leave: pacing lebih nyaman; tinggi total dijaga sama agar tidak mengubah tata letak layar pendek ---- */
+.chapter--leave.is-active .lw, .chapter--leave.is-leaving .lw { animation-delay: calc(1100ms + var(--w, 0) * 70ms); animation-duration: 1s; }
+.leave-closing { position: relative; }
+.leave-closing::before { content: ""; position: absolute; top: -1.05rem; left: 50%; width: 38px; height: 1px; margin-left: -19px; background: linear-gradient(90deg, transparent, rgba(233, 203, 195, .7), transparent); }
+.leave-actions .btn { min-width: min(240px, 100%); box-shadow: 0 10px 30px rgba(0, 0, 0, .28), 0 0 34px rgba(233, 203, 195, .16); }
+
+/* ---- Panel detail wish: pesan pribadi di antara bintang ---- */
+.cpanel {
+  background-image: linear-gradient(180deg, rgba(64, 57, 78, .78), rgba(34, 31, 44, .9));
+  border-color: rgba(233, 203, 195, .32);
+  padding-top: 2.4rem;
+  box-shadow: var(--glass-shine), inset 0 0 0 1px rgba(255, 241, 232, .04), 0 26px 64px rgba(0, 0, 0, .42), 0 0 52px rgba(201, 143, 145, .16);
+}
+.cpanel::before { content: ""; position: absolute; inset: 0 0 auto; height: 110px; border-radius: inherit; pointer-events: none; background: radial-gradient(60% 100% at 50% 0, rgba(233, 203, 195, .17), transparent); }
+.cpanel > * { position: relative; }
+.cpanel > .cpanel__close { position: absolute; }
+.cpanel__title { margin-bottom: 1.2rem; font: 500 var(--fs-xs) var(--sans); letter-spacing: .28em; text-transform: uppercase; color: var(--blush); }
+.cpanel__text { max-width: 26ch; margin-inline: auto; line-height: 1.5; color: var(--ivory); }
+.cpanel__date { margin-top: 1.6rem; letter-spacing: .18em; color: var(--fg-soft); }
+.cpanel__date::before { content: ""; display: block; width: 36px; height: 1px; margin: 0 auto .95rem; background: linear-gradient(90deg, transparent, rgba(233, 203, 195, .55), transparent); }
+.cpanel__date:empty { display: none; }
+.cpanel__close:focus-visible { outline: 2px solid var(--blush); outline-offset: 2px; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .cpanel__title { margin-bottom: .6rem; font-size: var(--fs-xs); }
+  .cpanel__date { margin-top: .8rem; }
+  .cpanel__date::before { margin-bottom: .5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes revealLight { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes revealBlur { from { opacity: 0; } to { opacity: 1; } }
+  .reveal.show .r0 { animation-delay: .1s; } .reveal.show .r1 { animation-delay: .3s; } .reveal.show .r2 { animation-delay: .6s; }
+  .reveal.show .r3 { animation-delay: .9s; } .reveal.show .r4 { animation-delay: 1.2s; }
+  .reveal.show .r { animation-duration: .6s; }
+  .chapter--leave.is-active .lw, .chapter--leave.is-leaving .lw { animation-delay: calc(300ms + var(--w, 0) * 10ms); animation-duration: .5s; }
+}
+@media (orientation: landscape) and (max-height: 520px) { .leave-closing::before { display: none; } }
