@@ -25,11 +25,11 @@ window.LETTER_CONFIG = {
   /* ======================= IDENTITAS & ISI PERSONAL ======================= */
   siteTitle: "A Letter Between the Stars",
 
-  recipientName:   "[NAMA_PENERIMA]",   // nama orang yang dituju
-  senderName:      "[NAMA_PENGIRIM]",   // nama Anda (diungkap di chapter 5)
+  recipientName:   "Ran?",   // nama orang yang dituju
+  senderName:      "Rei",   // nama Anda (diungkap di chapter 5)
   personalMessage: "[PESAN_PERSONAL]",  // satu paragraf pribadi di dalam surat
-  memory:          "[KENANGAN]",        // satu kenangan singkat (dipakai di kartu & bintang)
-  specialDate:     "[TANGGAL_SPESIAL]", // mis. "7 November 2026"
+  memory:          "The moment you cheer me up when i've give up, you may not say anything, but it feels better when i hear it.",        // satu kenangan singkat (dipakai di kartu & bintang)
+  specialDate:     "8 April 2026", // mis. "7 November 2026"
 
   // Tampilkan "for <nama penerima>" kecil di halaman pembuka?
   showRecipientOnIntro: true,
